@@ -314,8 +314,39 @@ safe('pets', () => {
     const bh = Math.round(H * 0.62), bw = Math.round(bh * 1.6), k = bh / 60;
     ctx.save();
     ctx.translate(Math.round(W / 2 - bw / 2), fy - (bh - 4 * k));
-    P.drawPet(new LSC.Context(ctx), S, A, t, bw, bh, P.PETS[id]);
+    P.drawPet(new LSC.Context(ctx), S, A, t, bw, bh, dressed(id));
     ctx.restore();
+  }
+  // seasonal hats (art/site/sticker-*.png): drawn in the pet's own drawOver step, so they follow hops and tilts
+  // hat: visible width `w` (in body half-widths a), its brim `brim` of the way down the image, sitting `dy`
+  // (in body half-heights b) below the top of the head; clips: an image `w` wide centred at (x a, y b) from the top
+  const WEAR = {
+    snowcap: {label: 'Snow cap', hat: true, w: 1.25, ink: 0.67, brim: 0.80, dy: 0.32},
+    leaf: {label: 'Autumn leaf', w: 0.95, x: 0.62, y: 0.12},
+    blossom: {label: 'Blossom', w: 0.9, x: 0.62, y: 0.12},
+  };
+  const TIP = {ember: 1.5, pip: 1.25};                             // pointed pets: the top is above the body
+  const wearImg = {};
+  let wearing = null;
+  function dressed(pid) {
+    const def = P.PETS[pid];
+    if (!wearing) return def;
+    const img = wearImg[wearing], w = WEAR[wearing];
+    if (!img || !img.complete || !img.naturalWidth) return def;
+    return Object.assign(Object.create(def), {
+      drawOver(E) {
+        if (def.drawOver) def.drawOver.call(def, E);
+        if (E.mood === 'sleep' && wearing === 'snowcap') return;   // the sleeping pets already wear a nightcap
+        const top = E.cy - E.b * (TIP[pid] || 1);
+        if (w.hat) {
+          const size = E.a * w.w / w.ink;
+          E.cr.ctx.drawImage(img, E.cx - size / 2, top + E.b * w.dy - size * w.brim, size, size);
+        } else {
+          const size = E.a * w.w;
+          E.cr.ctx.drawImage(img, E.cx + E.a * w.x - size / 2, top + E.b * w.y - size / 2, size, size);
+        }
+      },
+    });
   }
   let last = 0;
   const loop = now => {
@@ -400,6 +431,20 @@ safe('pets', () => {
         if (!was) on.add(key); else on.delete(key);
         box.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(on.has(x.dataset.key))));
         apply();
+      });
+      box.appendChild(b);
+    });
+  })();
+  (() => {
+    const box = $('#pet-wear');
+    Object.entries(WEAR).forEach(([key, w]) => {
+      const b = chip(w.label); b.setAttribute('aria-pressed', 'false'); b.dataset.wear = key;
+      b.addEventListener('click', () => {
+        wearing = wearing === key ? null : key;
+        if (wearing && !wearImg[key]) { const im = new Image(); im.onload = kick; im.src = `art/site/sticker-${key}.png`; wearImg[key] = im; }
+        box.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.wear === wearing)));
+        say(wearing ? `${INFO[id][0]} put on the ${w.label.toLowerCase()}` : `${INFO[id][0]} took the hat off`);
+        kick();
       });
       box.appendChild(b);
     });

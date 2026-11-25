@@ -61,6 +61,9 @@ def test_site_images_exist():
     refs |= {'art/glob/%s/showcase.png' % p for p in pets} | {'art/demos/glass-%s.jpg' % t for t in ('night', 'day')}
     for c in re.search(r"const CARDS = \[([^\]]+)\]", js).group(1).replace("'", '').split(','):
         refs.add('art/site/cards/%s.jpg' % c.strip())
+    refs |= {'art/site/sticker-%s.png' % k for k in re.findall(r"^\s+(\w+): \{label: ", js, re.M)}
+    lost = open(os.path.join(site, '404.html')).read()        # served at any path, so linked from the site root
+    refs |= {r[len('/living-sky/'):] for r in re.findall(r'(?:src|href)="(/living-sky/art/[^"]+)"', lost)}
     missing = [r for r in sorted(refs) if not os.path.exists(os.path.join(ROOT, r))]
     assert not missing, missing
 

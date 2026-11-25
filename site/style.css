@@ -281,3 +281,53 @@ main ul { padding-left: 20px; } li { margin: 4px 0; }
   .pet-detail, .pet-detail.open { transition: none !important; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
 }
+
+/* how it works: a three-panel story, then six features */
+.how { padding-top: clamp(40px, 6vw, 64px); }
+.story { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; counter-reset: story; }
+.story li { margin: 0; }
+.story img { width: 100%; border-radius: 14px; border: 1px solid var(--line); box-shadow: 0 10px 30px var(--shadow); }
+.story p { margin: 10px 2px 0; color: var(--subtext); font-size: 15px; }
+.story b { color: var(--text); }
+.features { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.features li { margin: 0; display: grid; grid-template-columns: 52px 1fr; grid-template-rows: auto auto; column-gap: 14px; align-items: center;
+  padding: 14px 16px; background: var(--glass); border: 1px solid var(--line); border-radius: 14px;
+  transition: border-color .2s, transform .2s; }
+.features li:hover { border-color: var(--accent); transform: translateY(-2px); }
+.features img { grid-row: span 2; width: 52px; height: 52px; border-radius: 0; }
+.features b { font-size: 15px; }
+.features span { color: var(--subtext); font-size: 14px; line-height: 1.45; }
+
+/* install, as three quest steps */
+.quest { list-style: none; margin: 24px 0 8px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.quest li { margin: 0; background: var(--glass); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.quest img { width: 100%; border-radius: 0; border-bottom: 1px solid var(--line); }
+.quest p { margin: 0; padding: 12px 14px 14px; font-size: 14px; color: var(--subtext); }
+.quest b { color: var(--text); }
+
+/* the globs asleep around the campfire, closing the page */
+.vignette { margin: 48px auto -24px; max-width: 960px; padding: 0 16px;
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); }
+.vignette img { width: 100%; border-radius: 0; }
+
+/* 404 */
+.lost section { max-width: 720px; text-align: center; padding-bottom: 32px; }
+.lost section img { margin: 0 auto 8px; max-width: 520px; width: 100%;
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); }
+.lost .lead { margin-inline: auto; }
+.lost .cta { justify-content: center; }
+
+@media (max-width: 900px) {
+  .story, .quest { grid-template-columns: minmax(0, 1fr); max-width: 520px; }
+  .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) { .features { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-color-scheme: light) {      /* the art is painted on the dark page colour: frame it as a night window */
+  .vignette { -webkit-mask-image: none; mask-image: none; margin: 48px auto 0; max-width: 760px; }
+  .vignette img, .lost section img { border-radius: 18px; box-shadow: 0 14px 40px var(--shadow); }
+  .lost section img { -webkit-mask-image: none; mask-image: none; }
+  .quest li, .story img { background: #1e1e2e; }
+  .quest p { background: var(--glass); }
+}

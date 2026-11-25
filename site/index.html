@@ -78,6 +78,26 @@
   <span>live weather</span><span>pixel art</span><span>frosted glass cards</span><span>a settings app</span><span>MIT</span>
 </div></div>
 
+<section id="how" class="how" aria-labelledby="how-h">
+  <h2 id="how-h" class="sr">How it works</h2>
+  <ol class="story">
+    <li><img src="art/site/how-1.png" alt="A desktop at sunrise: the lake wallpaper's sky is pale gold, the sun just over the mountains" width="640" height="400" loading="lazy" decoding="async">
+      <p><b>Morning.</b> The wallpaper is redrawn for where the sun really is.</p></li>
+    <li><img src="art/site/how-2.png" alt="The same desktop at sunset: an orange and pink sky, warmer card colours" width="640" height="400" loading="lazy" decoding="async">
+      <p><b>Evening.</b> The sky warms up, and the cards follow it.</p></li>
+    <li><img src="art/site/how-3.png" alt="The desktop at night: stars and the moon, Mimi in a sleeping cap yawning on the clock card" width="640" height="400" loading="lazy" decoding="async">
+      <p><b>Night.</b> The moon in its real phase, and your pet heads to bed.</p></li>
+  </ol>
+  <ul class="features">
+    <li><img src="art/site/icon-sky.png" alt="" width="64" height="64" loading="lazy"><b>The real sky</b><span>Sun, moon, stars and weather for your location.</span></li>
+    <li><img src="art/site/icon-card.png" alt="" width="64" height="64" loading="lazy"><b>Glass cards</b><span>Clock, weather, CPU, memory, GPU, network and more.</span></li>
+    <li><img src="art/site/icon-glob.png" alt="" width="64" height="64" loading="lazy"><b>Six little pets</b><span>On your cards and in your top panel.</span></li>
+    <li><img src="art/site/icon-gear.png" alt="" width="64" height="64" loading="lazy"><b>A settings app</b><span>Or one plain file; changes apply in seconds.</span></li>
+    <li><img src="art/site/icon-lock.png" alt="" width="64" height="64" loading="lazy"><b>Private</b><span>No window titles, no keystrokes, no account.</span></li>
+    <li><img src="art/site/icon-palette.png" alt="" width="64" height="64" loading="lazy"><b>Your colours</b><span>Catppuccin, tuned through the day.</span></li>
+  </ul>
+</section>
+
 <section id="looks" aria-labelledby="looks-h">
   <p class="eyebrow">01 · the sky</p>
   <h2 id="looks-h">Day and night</h2>
@@ -159,6 +179,8 @@
         <div class="chips" id="pet-acts"></div>
         <p class="ctl-h">Mood and weather</p>
         <div class="chips" id="pet-moods"></div>
+        <p class="ctl-h">Seasonal hats</p>
+        <div class="chips" id="pet-wear"></div>
         <div id="pet-extra"></div>
         <p class="note">Tip: click the pet to poke it. This is the same drawing code as the desktop and panel pet.</p>
         <button class="btn small" id="pet-more" type="button" aria-expanded="false" aria-controls="pet-detail">Every look of Mimi</button>
@@ -238,6 +260,14 @@ cd ~/living-sky
       </ul>
     </aside>
   </div>
+  <ol class="quest" aria-label="Three steps">
+    <li><img src="art/site/quest-1.png" alt="Pip carrying a parcel with a git branch on it" width="360" height="240" loading="lazy" decoding="async">
+      <p><b>1 · Clone</b> the project anywhere you like.</p></li>
+    <li><img src="art/site/quest-2.png" alt="Cubo in a hard hat ticking off a checklist" width="360" height="240" loading="lazy" decoding="async">
+      <p><b>2 · Run the installer.</b> It checks everything and asks a few questions.</p></li>
+    <li><img src="art/site/quest-3.png" alt="All six globs cheering on a desktop card under falling stars" width="360" height="240" loading="lazy" decoding="async">
+      <p><b>3 · Done.</b> The sky starts moving and your pet moves in.</p></li>
+  </ol>
   <h3>Uninstall</h3>
   <pre data-no-copy data-title="uninstall · pick one"><code>./uninstall.sh                # keeps your settings
 ./uninstall.sh --purge        # removes them too
@@ -299,6 +329,8 @@ living-sky preview --demo        # a PNG of your desktop with personal details h
   </div>
 </section>
 </main>
+
+<div class="vignette" aria-hidden="true"><img src="art/site/footer-camp.png" alt="" width="960" height="320" loading="lazy" decoding="async"></div>
 
 <footer class="site-footer">
   <div class="foot-grid">
