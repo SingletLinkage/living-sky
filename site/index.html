@@ -3,134 +3,183 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>living-sky</title>
+<title>living-sky: a GNOME desktop under the real sky</title>
+<script>document.documentElement.classList.add('js')</script>
 <meta name="description" content="A GNOME conky desktop whose wallpaper follows the real sky: painted scenes relit for the sun, moon, season and weather, Catppuccin glass cards, and little glob pets.">
-<meta property="og:title" content="living-sky">
+<link rel="canonical" href="https://singletlinkage.github.io/living-sky/">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#eff1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1e1e2e" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="living-sky">
+<meta property="og:url" content="https://singletlinkage.github.io/living-sky/">
+<meta property="og:title" content="living-sky: a GNOME desktop under the real sky">
 <meta property="og:description" content="A GNOME desktop whose wallpaper follows the real sky, with glass cards and little glob pets.">
-<meta property="og:image" content="art/demos/glass-night.jpg">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta property="og:image" content="https://singletlinkage.github.io/living-sky/art/demos/glass-night.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:image:alt" content="A lake wallpaper at night with frosted info cards">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="living-sky: a GNOME desktop under the real sky">
+<meta name="twitter:description" content="A GNOME desktop whose wallpaper follows the real sky, with glass cards and little glob pets.">
+<meta name="twitter:image" content="https://singletlinkage.github.io/living-sky/art/demos/glass-night.jpg">
+<link rel="icon" href="icon.svg" type="image/svg+xml" sizes="any">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body id="top">
+<a class="skip" href="#main">Skip to content</a>
 <header class="top">
-  <a class="brand" href="#">living-sky</a>
-  <nav>
+  <a class="brand" href="#top" aria-label="living-sky, back to top">living-sky</a>
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav">
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    <span>Menu</span>
+  </button>
+  <nav id="site-nav" aria-label="Primary">
     <a href="#looks">Looks</a><a href="#scenes">Scenes</a><a href="#pets">Pets</a><a href="#cards">Cards</a>
     <a href="#install">Install</a><a href="#configure">Configure</a>
+    <a href="https://github.com/SingletLinkage/living-sky/blob/main/docs/how-it-works.md">Docs</a>
     <a class="gh" href="https://github.com/SingletLinkage/living-sky">GitHub</a>
   </nav>
 </header>
 
-<main>
+<main id="main" tabindex="-1">
 <section class="hero">
   <div class="hero-text">
     <h1>Your desktop, under the real sky.</h1>
-    <p>A conky desktop for GNOME. The wallpaper is redrawn through the day for the real sun, moon and
-      weather where you are; frosted cards show the time, weather and your machine; and a little glob pet
-      lives on them, reacting to the time, the weather, your music and your typing.</p>
+    <p class="lead">Your wallpaper is redrawn through the day for the real sun, moon and weather where you are.
+      Frosted info cards and a little glob pet sit on top.</p>
     <div class="cta">
       <a class="btn primary" href="#install">Install</a>
       <a class="btn" href="https://github.com/SingletLinkage/living-sky">View on GitHub</a>
     </div>
-    <p class="small">Free and open source (MIT) · GNOME on X11 · about 2 % of one CPU core</p>
+    <ul class="facts">
+      <li>Free and open source (MIT)</li>
+      <li><a href="#requirements">GNOME on X11</a></li>
+      <li>about 2&nbsp;% of one CPU core</li>
+    </ul>
   </div>
-  <figure class="hero-media">
-    <img src="art/demos/sky-day.gif" alt="A day of the living sky, from night through sunrise and noon to sunset" width="640" height="400">
-    <figcaption>One day of the sky over the lake, sped up.</figcaption>
+  <figure class="hero-media" id="hero-media">
+    <img id="hero-img" src="art/demos/glass-night.jpg" data-gif="art/demos/sky-day.gif" alt="A lake wallpaper at night with frosted info cards" width="640" height="400" decoding="async" fetchpriority="high">
+    <figcaption id="hero-cap">One day of the sky over the lake, sped up.</figcaption>
   </figure>
 </section>
 
-<section id="looks">
-  <h2>Two looks, day and night</h2>
+<section id="looks" aria-labelledby="looks-h">
+  <h2 id="looks-h">Two looks, day and night</h2>
   <p class="lead">The card palette follows the sky through the Catppuccin flavours: Mocha at night, Latte by day,
     in the accent colours you pick.</p>
-  <div class="switch" role="tablist" aria-label="Card style">
-    <button class="on" data-style="glass">Glass</button><button data-style="cards">Cards</button>
-    <span class="sep"></span>
-    <button class="on" data-time="night">Night</button><button data-time="day">Day</button>
+  <div class="switch">
+    <span role="group" aria-label="Card style"><button class="on" data-style="glass" aria-pressed="true">Glass</button><button data-style="cards" aria-pressed="false">Cards</button></span>
+    <span class="sep" aria-hidden="true"></span>
+    <span role="group" aria-label="Time of day"><button class="on" data-time="night" aria-pressed="true">Night</button><button data-time="day" aria-pressed="false">Day</button></span>
   </div>
-  <figure class="frame"><img id="look-img" src="art/demos/glass-night.jpg" alt="The glass style at night" loading="lazy"></figure>
+  <figure class="frame"><img id="look-img" src="art/demos/glass-night.jpg" alt="The glass style at night" width="1280" height="800" loading="lazy" decoding="async"></figure>
   <p class="note">Glass: frosted liquid-glass panes over the wallpaper. Cards: solid Catppuccin cards.</p>
 </section>
 
-<section id="scenes">
-  <h2>Four painted scenes</h2>
+<section id="scenes" aria-labelledby="scenes-h">
+  <h2 id="scenes-h">Four painted scenes</h2>
   <p class="lead">Each scene is a painting, traced once into layers and relit live for the hour, the season and the
     weather. Snow settles only when it really snows (or in a high-latitude winter).</p>
   <div class="switch" role="tablist" aria-label="Scene">
-    <button class="on" data-scene="lake">Lake</button><button data-scene="forest">Forest</button>
-    <button data-scene="city">City</button><button data-scene="camp">Camp</button>
+    <button id="tab-scene-lake" class="on" data-scene="lake">Lake</button><button id="tab-scene-forest" data-scene="forest">Forest</button>
+    <button id="tab-scene-city" data-scene="city">City</button><button id="tab-scene-camp" data-scene="camp">Camp</button>
   </div>
-  <p id="scene-text" class="note"></p>
-  <figure class="frame"><img id="scene-img" src="art/demos/scene-lake.jpg" alt="The lake scene at four times of day" loading="lazy"></figure>
-  <details class="more"><summary>Hour by hour (24 renders)</summary>
-    <img id="hours-img" src="art/demos/hours/lake.jpg" alt="The lake scene for every hour of a day" loading="lazy">
+  <div id="scene-panel" role="tabpanel" aria-labelledby="tab-scene-lake">
+    <p id="scene-text" class="note" aria-live="polite">Mountains over a lake with reflections; snow on the lit faces of the peaks in winter.</p>
+    <figure class="frame"><img id="scene-img" src="art/demos/scene-lake.jpg" alt="The lake scene at four times of day" width="1920" height="300" loading="lazy" decoding="async"></figure>
+  </div>
+  <details class="more" id="hours-details"><summary>Hour by hour (24 renders)</summary>
+    <img id="hours-img" src="art/demos/hours/lake.jpg" alt="The lake scene for every hour of a day" width="2400" height="1000" loading="lazy" decoding="async">
   </details>
-  <div class="grid two">
-    <figure><img src="art/demos/seasons.jpg" alt="Every scene in spring, summer, autumn and winter" loading="lazy">
-      <figcaption>Seasons, blended through the year for your hemisphere.</figcaption></figure>
-    <figure><img src="art/demos/pixel.jpg" alt="Every scene as dithered pixel art" loading="lazy">
-      <figcaption>Any scene as dithered pixel art: <code>pixel = on</code>.</figcaption></figure>
+  <figure class="wide">
+    <img src="art/demos/seasons.jpg" alt="Every scene in spring, summer, autumn and winter" width="1920" height="1200" loading="lazy" decoding="async">
+    <figcaption>Seasons, blended through the year for your hemisphere.</figcaption>
+  </figure>
+  <div class="pixel-row">
+    <img src="art/demos/pixel.jpg" alt="Every scene as dithered pixel art" width="960" height="1200" loading="lazy" decoding="async">
+    <div><h3>Pixel mode</h3><p class="lead">Any scene as dithered pixel art: <code>pixel = on</code>.</p></div>
   </div>
 </section>
 
-<section id="pets">
-  <h2>Meet the globs</h2>
+<section id="pets" aria-labelledby="pets-h">
+  <h2 id="pets-h">Meet the globs</h2>
   <p class="lead">Pick one, a different one every day (<code>glob = random</code>), or the one that matches your scene
     (<code>glob = scene</code>). They sleep, dance to music, watch videos, type along with you, wear sunglasses in
     strong sun and masks when the air is bad, and get grumpy if you wake or ignore them. The same pet can sit in
     your top panel too.</p>
+  <img class="lineup" src="art/glob/lineup.png" alt="The six globs in a row: Mimi, Pip, Bun, Nyx, Cubo and Ember" width="1560" height="310" loading="lazy" decoding="async">
+  <p class="note hint">Click a pet to see every mood.</p>
   <div class="pets" id="pet-list"></div>
-  <div class="pet-detail" id="pet-detail" hidden>
-    <div class="pet-detail-head"><h3 id="pet-name"></h3><button class="btn small" id="pet-close">Close</button></div>
-    <img id="pet-sheet" alt="" loading="lazy">
+  <noscript><p class="note">The pet picker needs JavaScript; the lineup above shows all six.</p></noscript>
+  <div class="pet-detail" id="pet-detail" inert>
+    <div class="pet-detail-inner">
+      <div class="pet-detail-body">
+        <div class="pet-info">
+          <h3 id="pet-name" tabindex="-1"></h3>
+          <p id="pet-text"></p>
+          <p class="tag" id="pet-tag"></p>
+          <button class="btn small" id="pet-close" type="button">Close</button>
+        </div>
+        <div class="sheet" tabindex="0" role="group" aria-label="Showcase sheet, scrollable"><img id="pet-sheet" alt="" width="1360" height="2794" decoding="async"></div>
+      </div>
+    </div>
   </div>
 </section>
 
-<section id="cards">
-  <h2>The cards</h2>
+<section id="cards" aria-labelledby="cards-h">
+  <h2 id="cards-h">The cards</h2>
   <p class="lead">Six on by default, four more you can switch on; they wrap into a second column when the screen
     is full. Hardware is detected automatically.</p>
-  <div class="switch wrap" id="card-tabs"></div>
-  <figure class="frame narrow"><img id="card-img" src="art/demos/cards/clock.jpg" alt="" loading="lazy">
-    <figcaption>Glass at night · glass by day · cards at night · cards by day.</figcaption></figure>
+  <div class="switch wrap" id="card-tabs" role="tablist" aria-label="Card"></div>
+  <div id="card-panel" role="tabpanel" aria-labelledby="tab-card-clock">
+    <figure class="frame narrow"><div class="card-box"><img id="card-img" src="art/demos/cards/clock.jpg" alt="The clock card in both styles, night and day" width="1588" height="206" loading="lazy" decoding="async"></div>
+      <figcaption>Glass at night · glass by day · cards at night · cards by day.</figcaption></figure>
+  </div>
   <details class="more"><summary>All ten cards at once, and the colour sets</summary>
-    <img src="art/demos/all-cards.jpg" alt="All ten cards" loading="lazy">
-    <img src="art/demos/colors.jpg" alt="The colour sets through the day" loading="lazy">
+    <img src="art/demos/all-cards.jpg" alt="All ten cards" width="1280" height="800" loading="lazy" decoding="async">
+    <img src="art/demos/colors.jpg" alt="The colour sets through the day" width="1404" height="932" loading="lazy" decoding="async">
   </details>
   <p class="note">Making your own card is one small Lua file:
     <a href="https://github.com/SingletLinkage/living-sky/blob/main/lua/cards/README.md">lua/cards/README.md</a>.
     Your own pet: <a href="https://github.com/SingletLinkage/living-sky/blob/main/lua/glob/README.md">lua/glob/README.md</a>.</p>
 </section>
 
-<section id="install">
-  <h2>Install</h2>
-  <pre><code>git clone https://github.com/SingletLinkage/living-sky ~/living-sky
+<section id="install" aria-labelledby="install-h">
+  <h2 id="install-h">Install</h2>
+  <div class="install-grid">
+    <div class="install-main">
+      <pre><code>git clone https://github.com/SingletLinkage/living-sky ~/living-sky
 cd ~/living-sky
 ./install.sh</code></pre>
-  <p>The installer checks what living-sky needs and offers to install what's missing (packages through apt, dnf,
-    pacman or zypper after asking; the conky AppImage if your distro's conky is too old; the fonts), asks a few
-    questions, adds the <b>Living Sky</b> settings app and a login entry, and starts it.
-    <code>--yes</code> takes the defaults, <code>--dry-run</code> shows what it would do.</p>
-  <h3>Requirements</h3>
-  <ul>
-    <li>GNOME on <b>X11</b> (Wayland isn't supported yet). The panel pet works on GNOME 42–48.</li>
-    <li>conky 1.19+ with Lua cairo (or the conky AppImage, which the installer can fetch).</li>
-    <li>Python 3 with numpy, OpenCV, Pillow, PyGObject and python-xlib; GTK 4 + libadwaita for the settings app.</li>
-    <li>curl, xrandr, gsettings; fonts JetBrains Mono, FiraCode Nerd Font and Bebas Neue.</li>
-  </ul>
+      <p class="reqline">Needs GNOME on X11, conky 1.19+ and Python 3. <a href="#requirements">Full list</a>.</p>
+      <p>The installer checks what living-sky needs and offers to install what's missing (packages through apt, dnf,
+        pacman or zypper after asking; the conky AppImage if your distro's conky is too old; the fonts), asks a few
+        questions, adds the <b>Living Sky</b> settings app and a login entry, and starts it.
+        <code>--yes</code> takes the defaults, <code>--dry-run</code> shows what it would do.</p>
+    </div>
+    <aside class="side-card" aria-labelledby="requirements">
+      <h3 id="requirements">Requirements</h3>
+      <ul>
+        <li>GNOME on <b>X11</b> (Wayland isn't supported yet). The panel pet works on GNOME 42–48.</li>
+        <li>conky 1.19+ with Lua cairo (or the conky AppImage, which the installer can fetch).</li>
+        <li>Python 3 with numpy, OpenCV, Pillow, PyGObject and python-xlib; GTK 4 + libadwaita for the settings app.</li>
+        <li>curl, xrandr, gsettings; fonts JetBrains Mono, FiraCode Nerd Font and Bebas Neue.</li>
+      </ul>
+    </aside>
+  </div>
   <h3>Uninstall</h3>
   <pre><code>./uninstall.sh                # keeps your settings
 ./uninstall.sh --purge        # removes them too
 ./uninstall.sh --purge-deps   # also the fonts and conky the installer downloaded</code></pre>
 </section>
 
-<section id="configure">
-  <h2>Use and configure</h2>
-  <p>Open <b>Living Sky</b> from your apps (or right-click the panel pet): pages for the look, colours and pet,
+<section id="configure" aria-labelledby="configure-h">
+  <h2 id="configure-h">Use and configure</h2>
+  <p class="lead">Open <b>Living Sky</b> from your apps (or right-click the panel pet): pages for the look, colours and pet,
     cards, location, and the system side. It edits one plain file,
     <code>~/.config/living-sky/living-sky.conf</code>, keeping its comments, so editing it by hand works too;
     the running desktop picks up changes within about 5 seconds.</p>
@@ -142,6 +191,8 @@ living-sky config                # the file in your editor
 living-sky logs [-f]             # recent log lines and errors
 living-sky doctor                # what was detected (for bug reports)
 living-sky preview --demo        # a PNG of your desktop with personal details hidden</code></pre>
+  <p class="note">Found a bug? Run <code>living-sky doctor</code> and
+    <a href="https://github.com/SingletLinkage/living-sky/issues">report it on GitHub</a>.</p>
   <div class="grid two keys">
     <div><h3>Look</h3><p><code>theme</code> glass | cards · <code>scene</code> lake | forest | city | camp ·
       <code>pixel</code> on | off · <code>season</code> auto or one of four · <code>colors</code> auto, lavender,
@@ -154,8 +205,8 @@ living-sky preview --demo        # a PNG of your desktop with personal details h
   </div>
 </section>
 
-<section id="privacy">
-  <h2>Privacy</h2>
+<section id="privacy" aria-labelledby="privacy-h">
+  <h2 id="privacy-h">Privacy</h2>
   <ul>
     <li>Location: one IP lookup (ipinfo.io, falling back to ipapi.co) unless you set coordinates; then cached.</li>
     <li>Weather and air quality: <a href="https://open-meteo.com">Open-Meteo</a>, no account, every 15 minutes.</li>
@@ -163,14 +214,43 @@ living-sky preview --demo        # a PNG of your desktop with personal details h
       and only <i>that</i> a key went down, never which. Nothing else leaves your machine.</li>
   </ul>
 </section>
+
+<section class="cta-band" aria-labelledby="cta-h">
+  <h2 id="cta-h">Put the sky on your desktop</h2>
+  <p class="lead">Free, open source, and one install script away.</p>
+  <div class="cta">
+    <a class="btn primary" href="#install">Install living-sky</a>
+    <a class="btn" href="https://github.com/SingletLinkage/living-sky">Star it on GitHub</a>
+  </div>
+</section>
 </main>
 
-<footer>
-  <p>living-sky · MIT · colours by <a href="https://github.com/catppuccin/catppuccin">Catppuccin</a> ·
-    scene paintings generated with Google Gemini and traced into layers ·
-    <a href="https://github.com/SingletLinkage/living-sky/blob/main/docs/how-it-works.md">how it works</a> ·
-    <a href="https://github.com/SingletLinkage/living-sky/blob/main/CONTRIBUTING.md">contributing</a></p>
+<footer class="site-footer">
+  <div class="foot-grid">
+    <div class="foot-brand"><a class="brand" href="#top">living-sky</a>
+      <p>A conky desktop for GNOME that follows the real sky.</p></div>
+    <nav aria-label="Project"><p class="foot-h">Project</p><ul>
+      <li><a href="https://github.com/SingletLinkage/living-sky">Source on GitHub</a></li>
+      <li><a href="https://github.com/SingletLinkage/living-sky/blob/main/docs/how-it-works.md">How it works</a></li>
+      <li><a href="https://github.com/SingletLinkage/living-sky/blob/main/CONTRIBUTING.md">Contributing</a></li>
+      <li><a href="https://github.com/SingletLinkage/living-sky/issues">Report a bug</a></li>
+      <li><a href="https://github.com/SingletLinkage/living-sky/blob/main/LICENSE">MIT license</a></li></ul></nav>
+    <nav aria-label="On this page"><p class="foot-h">On this page</p><ul>
+      <li><a href="#looks">Looks</a></li><li><a href="#scenes">Scenes</a></li><li><a href="#pets">Pets</a></li>
+      <li><a href="#cards">Cards</a></li><li><a href="#install">Install</a></li><li><a href="#configure">Configure</a></li>
+      <li><a href="#privacy">Privacy</a></li></ul></nav>
+    <div><p class="foot-h">Credits</p><ul>
+      <li>Colours by <a href="https://github.com/catppuccin/catppuccin">Catppuccin</a> (MIT)</li>
+      <li>Scene paintings generated with Google Gemini and traced into layers</li>
+      <li>Pet behaviour partly inspired by <a href="https://github.com/miflow13/mochi-desktop">mochi-desktop</a> (MIT)</li>
+      <li>Weather by <a href="https://open-meteo.com">Open-Meteo</a></li></ul></div>
+  </div>
+  <div class="foot-base">
+    <p>© 2026 living-sky contributors · Released under the <a href="https://github.com/SingletLinkage/living-sky/blob/main/LICENSE">MIT License</a>.</p>
+    <a class="to-top" href="#top">Back to top ↑</a>
+  </div>
 </footer>
+<span id="copy-status" class="sr" role="status" aria-live="polite"></span>
 <script src="app.js"></script>
 </body>
 </html>

@@ -4,3 +4,4 @@ __pycache__/
 *.tmp.png
 gnome-extension/build/
 .pytest_cache/
+.superpowers/
