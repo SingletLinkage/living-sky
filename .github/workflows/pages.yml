@@ -1,0 +1,36 @@
+name: site
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'art/**', 'app/living-sky.svg', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Stage the site (pages + the images from art/, not duplicated in git)
+        run: |
+          mkdir -p _site/art
+          cp site/* _site/
+          cp app/living-sky.svg _site/icon.svg
+          cp -r art/demos art/glob _site/art/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

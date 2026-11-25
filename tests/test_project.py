@@ -47,3 +47,21 @@ def test_panel_pet_draws(tmp_path):
     subprocess.run(['gjs', os.path.join(ROOT, 'gnome-extension', 'glob@living-sky', 'tools', 'render.js'), str(png)],
                    check=True, capture_output=True, cwd=os.path.join(ROOT, 'gnome-extension', 'glob@living-sky'))
     assert png.stat().st_size > 500
+
+
+def test_site_images_exist():
+    """Every image the website uses is in art/ (the pages workflow copies art/demos and art/glob next to it)."""
+    import re
+    site = os.path.join(ROOT, 'site')
+    html = open(os.path.join(site, 'index.html')).read()
+    js = open(os.path.join(site, 'app.js')).read()
+    refs = {r for r in re.findall(r'(?:src|href)="(art/[^"]+)"', html)}
+    for tmpl, keys in ((r'art/demos/scene-${s}.jpg', 'lake forest city camp'), (r'art/demos/hours/${s}.jpg', 'lake forest city camp'),
+                       (r'art/glob/${id}/${id}.gif', 'mimi pip bun nyx cubo ember'), (r'art/glob/${id}/showcase.png', 'mimi pip bun nyx cubo ember')):
+        refs |= {tmpl.replace('${s}', k).replace('${id}', k) for k in keys.split()}
+    for c in re.search(r"const CARDS = \[([^\]]+)\]", js).group(1).replace("'", '').split(','):
+        refs.add('art/demos/cards/%s.jpg' % c.strip())
+    for p in re.findall(r"\['(\w+)', '[A-Z]", js):
+        refs.add('art/glob/%s/%s.gif' % (p, p))
+    missing = [r for r in sorted(refs) if not os.path.exists(os.path.join(ROOT, r))]
+    assert not missing, missing

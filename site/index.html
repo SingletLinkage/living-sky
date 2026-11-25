@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>living-sky</title>
+<meta name="description" content="A GNOME conky desktop whose wallpaper follows the real sky: painted scenes relit for the sun, moon, season and weather, Catppuccin glass cards, and little glob pets.">
+<meta property="og:title" content="living-sky">
+<meta property="og:description" content="A GNOME desktop whose wallpaper follows the real sky, with glass cards and little glob pets.">
+<meta property="og:image" content="art/demos/glass-night.jpg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#">living-sky</a>
+  <nav>
+    <a href="#looks">Looks</a><a href="#scenes">Scenes</a><a href="#pets">Pets</a><a href="#cards">Cards</a>
+    <a href="#install">Install</a><a href="#configure">Configure</a>
+    <a class="gh" href="https://github.com/SingletLinkage/living-sky">GitHub</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero">
+  <div class="hero-text">
+    <h1>Your desktop, under the real sky.</h1>
+    <p>A conky desktop for GNOME. The wallpaper is redrawn through the day for the real sun, moon and
+      weather where you are; frosted cards show the time, weather and your machine; and a little glob pet
+      lives on them, reacting to the time, the weather, your music and your typing.</p>
+    <div class="cta">
+      <a class="btn primary" href="#install">Install</a>
+      <a class="btn" href="https://github.com/SingletLinkage/living-sky">View on GitHub</a>
+    </div>
+    <p class="small">Free and open source (MIT) · GNOME on X11 · about 2 % of one CPU core</p>
+  </div>
+  <figure class="hero-media">
+    <img src="art/demos/sky-day.gif" alt="A day of the living sky, from night through sunrise and noon to sunset" width="640" height="400">
+    <figcaption>One day of the sky over the lake, sped up.</figcaption>
+  </figure>
+</section>
+
+<section id="looks">
+  <h2>Two looks, day and night</h2>
+  <p class="lead">The card palette follows the sky through the Catppuccin flavours: Mocha at night, Latte by day,
+    in the accent colours you pick.</p>
+  <div class="switch" role="tablist" aria-label="Card style">
+    <button class="on" data-style="glass">Glass</button><button data-style="cards">Cards</button>
+    <span class="sep"></span>
+    <button class="on" data-time="night">Night</button><button data-time="day">Day</button>
+  </div>
+  <figure class="frame"><img id="look-img" src="art/demos/glass-night.jpg" alt="The glass style at night" loading="lazy"></figure>
+  <p class="note">Glass: frosted liquid-glass panes over the wallpaper. Cards: solid Catppuccin cards.</p>
+</section>
+
+<section id="scenes">
+  <h2>Four painted scenes</h2>
+  <p class="lead">Each scene is a painting, traced once into layers and relit live for the hour, the season and the
+    weather. Snow settles only when it really snows (or in a high-latitude winter).</p>
+  <div class="switch" role="tablist" aria-label="Scene">
+    <button class="on" data-scene="lake">Lake</button><button data-scene="forest">Forest</button>
+    <button data-scene="city">City</button><button data-scene="camp">Camp</button>
+  </div>
+  <p id="scene-text" class="note"></p>
+  <figure class="frame"><img id="scene-img" src="art/demos/scene-lake.jpg" alt="The lake scene at four times of day" loading="lazy"></figure>
+  <details class="more"><summary>Hour by hour (24 renders)</summary>
+    <img id="hours-img" src="art/demos/hours/lake.jpg" alt="The lake scene for every hour of a day" loading="lazy">
+  </details>
+  <div class="grid two">
+    <figure><img src="art/demos/seasons.jpg" alt="Every scene in spring, summer, autumn and winter" loading="lazy">
+      <figcaption>Seasons, blended through the year for your hemisphere.</figcaption></figure>
+    <figure><img src="art/demos/pixel.jpg" alt="Every scene as dithered pixel art" loading="lazy">
+      <figcaption>Any scene as dithered pixel art: <code>pixel = on</code>.</figcaption></figure>
+  </div>
+</section>
+
+<section id="pets">
+  <h2>Meet the globs</h2>
+  <p class="lead">Pick one, a different one every day (<code>glob = random</code>), or the one that matches your scene
+    (<code>glob = scene</code>). They sleep, dance to music, watch videos, type along with you, wear sunglasses in
+    strong sun and masks when the air is bad, and get grumpy if you wake or ignore them. The same pet can sit in
+    your top panel too.</p>
+  <div class="pets" id="pet-list"></div>
+  <div class="pet-detail" id="pet-detail" hidden>
+    <div class="pet-detail-head"><h3 id="pet-name"></h3><button class="btn small" id="pet-close">Close</button></div>
+    <img id="pet-sheet" alt="" loading="lazy">
+  </div>
+</section>
+
+<section id="cards">
+  <h2>The cards</h2>
+  <p class="lead">Six on by default, four more you can switch on; they wrap into a second column when the screen
+    is full. Hardware is detected automatically.</p>
+  <div class="switch wrap" id="card-tabs"></div>
+  <figure class="frame narrow"><img id="card-img" src="art/demos/cards/clock.jpg" alt="" loading="lazy">
+    <figcaption>Glass at night · glass by day · cards at night · cards by day.</figcaption></figure>
+  <details class="more"><summary>All ten cards at once, and the colour sets</summary>
+    <img src="art/demos/all-cards.jpg" alt="All ten cards" loading="lazy">
+    <img src="art/demos/colors.jpg" alt="The colour sets through the day" loading="lazy">
+  </details>
+  <p class="note">Making your own card is one small Lua file:
+    <a href="https://github.com/SingletLinkage/living-sky/blob/main/lua/cards/README.md">lua/cards/README.md</a>.
+    Your own pet: <a href="https://github.com/SingletLinkage/living-sky/blob/main/lua/glob/README.md">lua/glob/README.md</a>.</p>
+</section>
+
+<section id="install">
+  <h2>Install</h2>
+  <pre><code>git clone https://github.com/SingletLinkage/living-sky ~/living-sky
+cd ~/living-sky
+./install.sh</code></pre>
+  <p>The installer checks what living-sky needs and offers to install what's missing (packages through apt, dnf,
+    pacman or zypper after asking; the conky AppImage if your distro's conky is too old; the fonts), asks a few
+    questions, adds the <b>Living Sky</b> settings app and a login entry, and starts it.
+    <code>--yes</code> takes the defaults, <code>--dry-run</code> shows what it would do.</p>
+  <h3>Requirements</h3>
+  <ul>
+    <li>GNOME on <b>X11</b> (Wayland isn't supported yet). The panel pet works on GNOME 42–48.</li>
+    <li>conky 1.19+ with Lua cairo (or the conky AppImage, which the installer can fetch).</li>
+    <li>Python 3 with numpy, OpenCV, Pillow, PyGObject and python-xlib; GTK 4 + libadwaita for the settings app.</li>
+    <li>curl, xrandr, gsettings; fonts JetBrains Mono, FiraCode Nerd Font and Bebas Neue.</li>
+  </ul>
+  <h3>Uninstall</h3>
+  <pre><code>./uninstall.sh                # keeps your settings
+./uninstall.sh --purge        # removes them too
+./uninstall.sh --purge-deps   # also the fonts and conky the installer downloaded</code></pre>
+</section>
+
+<section id="configure">
+  <h2>Use and configure</h2>
+  <p>Open <b>Living Sky</b> from your apps (or right-click the panel pet): pages for the look, colours and pet,
+    cards, location, and the system side. It edits one plain file,
+    <code>~/.config/living-sky/living-sky.conf</code>, keeping its comments, so editing it by hand works too;
+    the running desktop picks up changes within about 5 seconds.</p>
+  <pre><code>living-sky start | stop | restart | status
+living-sky settings              # the settings window
+living-sky set scene camp        # change one setting (set --list: all of them)
+living-sky get scene
+living-sky config                # the file in your editor
+living-sky logs [-f]             # recent log lines and errors
+living-sky doctor                # what was detected (for bug reports)
+living-sky preview --demo        # a PNG of your desktop with personal details hidden</code></pre>
+  <div class="grid two keys">
+    <div><h3>Look</h3><p><code>theme</code> glass | cards · <code>scene</code> lake | forest | city | camp ·
+      <code>pixel</code> on | off · <code>season</code> auto or one of four · <code>colors</code> auto, lavender,
+      sakura, mint, peach, ocean, or two hex colours · <code>units</code> · <code>clock</code> 24h | 12h</p></div>
+    <div><h3>Cards</h3><p><code>card_&lt;id&gt; = on | off</code> for clock, weather, calendar, media, cpu, memory,
+      disks, gpu, battery, network · <code>cards = network, clock, …</code> sets the order</p></div>
+    <div><h3>Pet</h3><p><code>glob</code> mimi | pip | bun | nyx | cubo | ember | random | scene | off</p></div>
+    <div><h3>Sky and location</h3><p><code>lat</code>, <code>lon</code>, <code>name</code> (or looked up once from
+      your IP) · <code>interval_min</code> minutes between renders</p></div>
+  </div>
+</section>
+
+<section id="privacy">
+  <h2>Privacy</h2>
+  <ul>
+    <li>Location: one IP lookup (ipinfo.io, falling back to ipapi.co) unless you set coordinates; then cached.</li>
+    <li>Weather and air quality: <a href="https://open-meteo.com">Open-Meteo</a>, no account, every 15 minutes.</li>
+    <li>The pet notices only <i>which kind</i> of window is focused (terminal, editor, files, browser), never titles,
+      and only <i>that</i> a key went down, never which. Nothing else leaves your machine.</li>
+  </ul>
+</section>
+</main>
+
+<footer>
+  <p>living-sky · MIT · colours by <a href="https://github.com/catppuccin/catppuccin">Catppuccin</a> ·
+    scene paintings generated with Google Gemini and traced into layers ·
+    <a href="https://github.com/SingletLinkage/living-sky/blob/main/docs/how-it-works.md">how it works</a> ·
+    <a href="https://github.com/SingletLinkage/living-sky/blob/main/CONTRIBUTING.md">contributing</a></p>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>

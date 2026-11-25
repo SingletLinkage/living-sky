@@ -37,6 +37,27 @@ IP and place) or `python3 core/sky.py --at "2026-06-21 21:30" --scene camp --out
   regenerate the previews with `tools/scenesheet.py` and `tools/seasonsheet.py`.
 - **How it all fits together:** `docs/how-it-works.md`.
 
+## Project layout
+```
+app/              living_sky_settings.py (the GTK 4 / libadwaita settings window), its icon
+bin/              living-sky (CLI), living-sky-run (conky supervisor), clickthrough.py
+core/             sky.py (sky + palette renderer), scenes.py (the land), conf.py (the config file),
+                  weather.py, glob-presence.py (D-Bus / X11 helper)
+lua/desktop.lua   the engine: config, card runner, wallpaper switching, pet host
+lua/cards/        one file per card + README.md
+lua/lib/          ui.lua (drawing kit), sys.lua (/proc, /sys readers, hardware detection)
+lua/glob/         the pets: core.lua (shared behaviour + drawing), pick.lua, one file per pet, README.md
+themes/           glass/ and cards/: conky.conf + a 4-line style selector
+art/              <scene>/ (source picture + traced layers), demos/ (previews), glob/<pet>/
+gnome-extension/  glob@living-sky: the panel pet (pets/<pet>.js); esm/ + build-esm.py for GNOME 45+
+site/             the project website (deployed with art/ by .github/workflows/pages.yml)
+tests/            pytest suite (run by .github/workflows/ci.yml)
+tools/            previews (scenesheet, seasonsheet, daysheet, media.sh, cardshots.sh), art tracing
+docs/             how-it-works.md
+```
+Preview the website locally: copy `site/*` and `art/demos`, `art/glob` into one folder (as the workflow does) and
+open `index.html`.
+
 ## Style
 - Plain, readable code with short comments that say *why*; match what is around you.
 - Python 3.10, no new dependencies without a good reason (numpy, OpenCV, Pillow, PyGObject are there).
