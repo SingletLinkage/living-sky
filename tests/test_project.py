@@ -50,18 +50,21 @@ def test_panel_pet_draws(tmp_path):
 
 
 def test_site_images_exist():
-    """Every image the website uses is in art/ (the pages workflow copies art/demos and art/glob next to it)."""
+    """Every image the website uses exists (the pages workflow copies art/demos, art/glob and art/site next to it)."""
     import re
     site = os.path.join(ROOT, 'site')
     html = open(os.path.join(site, 'index.html')).read()
     js = open(os.path.join(site, 'app.js')).read()
-    refs = {r for r in re.findall(r'(?:src|href)="(art/[^"]+)"', html)}
-    for tmpl, keys in ((r'art/demos/scene-${s}.jpg', 'lake forest city camp'), (r'art/demos/hours/${s}.jpg', 'lake forest city camp'),
-                       (r'art/glob/${id}/${id}.gif', 'mimi pip bun nyx cubo ember'), (r'art/glob/${id}/showcase.png', 'mimi pip bun nyx cubo ember')):
-        refs |= {tmpl.replace('${s}', k).replace('${id}', k) for k in keys.split()}
+    refs = set(re.findall(r'(?:src|href|data-gif)="(art/[^"]+)"', html))
+    scenes, pets = 'lake forest city camp'.split(), 'mimi pip bun nyx cubo ember'.split()
+    refs |= {'art/demos/scene-%s.jpg' % s for s in scenes} | {'art/demos/hours/%s.jpg' % s for s in scenes}
+    refs |= {'art/glob/%s/showcase.png' % p for p in pets} | {'art/demos/glass-%s.jpg' % t for t in ('night', 'day')}
     for c in re.search(r"const CARDS = \[([^\]]+)\]", js).group(1).replace("'", '').split(','):
-        refs.add('art/demos/cards/%s.jpg' % c.strip())
-    for p in re.findall(r"\['(\w+)', '[A-Z]", js):
-        refs.add('art/glob/%s/%s.gif' % (p, p))
+        refs.add('art/site/cards/%s.jpg' % c.strip())
     missing = [r for r in sorted(refs) if not os.path.exists(os.path.join(ROOT, r))]
     assert not missing, missing
+
+
+def test_site_pets_bundle_in_sync():
+    """site/pets.js is generated from the panel pets; it must match a fresh build."""
+    subprocess.run([sys.executable, os.path.join(ROOT, 'gnome-extension', 'build-web.py'), '--check'], check=True)

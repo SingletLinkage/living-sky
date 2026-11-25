@@ -172,7 +172,7 @@ What follows describes the shared behaviour, with Mimi's timings (the defaults).
   - Music state changes are seen in under 0.5 s.
   - It naps after 5 min with no input and startles "!" when you're back.
   - Conky starts it when it's missing, and it exits when living-sky isn't running.
-- Ideas partly from miflow13/mochi-desktop (no code or art copied):
+- More pet behaviour:
   - **Panel clicks:** left-click pokes it (hop or squish), a double-click gives a heart. There's no menu.
   - **New random emotes:** wave, coffee (mostly in the morning), side-eye, a dance burst.
   - **Media:** a video playing (browser, VLC, mpv) means it **watches**, with screen glow and popcorn.

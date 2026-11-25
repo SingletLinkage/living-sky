@@ -69,7 +69,7 @@
   - **Astra**, a star / lantern moth: would overlap Nyx, so better as Nyx's companion than a pet of its own.
 - **Two pets at once** (`glob = mimi, nyx`): the second on another perch; they glance at each other, wave and
   dance together.
-- **Focus / pomodoro timer** (deferred from the mochi-desktop port):
+- **Focus / pomodoro timer** (deferred):
   - start it with a panel gesture, e.g. a triple-click (25/5 × 4);
   - the pet wears glasses and writes on a notepad, and the panel shows a countdown;
   - it waves at each break, with an optional `notify-send`;

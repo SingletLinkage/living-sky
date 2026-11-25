@@ -52,6 +52,8 @@ camelCase (`size, body, breath, blinkEvery, pose, eyes, drawUnder, drawBody, dra
 showcase sheet and GIF). Register the id in `extension.js` (`for (const id of [...])`), in
 `../esm/extension.js` (an import + `PETS`), and in `lua/glob/pick.lua` (`PETS`, and `SCENE` if it suits a scene)
 so `glob = random` / `scene` can choose it. `tests/test_pets.py` checks the lists match the files.
+For the website, add it to `ORDER` in `gnome-extension/build-web.py` and `INFO` in `site/app.js`, then run
+`gnome-extension/build-web.py`: the site's playground draws it with the same `pets/<id>.js`.
 
 ## Testing and images
 - `glob = <id>` in `living-sky.conf`, `living-sky restart`, then force a state with

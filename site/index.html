@@ -26,7 +26,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml" sizes="any">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body id="top">
@@ -38,7 +38,7 @@
     <span>Menu</span>
   </button>
   <nav id="site-nav" aria-label="Primary">
-    <a href="#looks">Looks</a><a href="#scenes">Scenes</a><a href="#pets">Pets</a><a href="#cards">Cards</a>
+    <a href="#looks">Sky</a><a href="#scenes">Scenes</a><a href="#pets">Pets</a><a href="#cards">Cards</a>
     <a href="#install">Install</a><a href="#configure">Configure</a>
     <a href="https://github.com/SingletLinkage/living-sky/blob/main/docs/how-it-works.md">Docs</a>
     <a class="gh" href="https://github.com/SingletLinkage/living-sky">GitHub</a>
@@ -62,86 +62,146 @@
     </ul>
   </div>
   <figure class="hero-media" id="hero-media">
-    <img id="hero-img" src="art/demos/glass-night.jpg" data-gif="art/demos/sky-day.gif" alt="A lake wallpaper at night with frosted info cards" width="640" height="400" decoding="async" fetchpriority="high">
-    <figcaption id="hero-cap">One day of the sky over the lake, sped up.</figcaption>
+    <div class="window">
+      <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>living-sky · lake · a day</span></div>
+      <img id="hero-img" src="art/demos/glass-night.jpg" data-gif="art/demos/sky-day.gif" alt="A lake wallpaper at night with frosted info cards" width="640" height="400" decoding="async" fetchpriority="high">
+    </div>
+    <canvas class="guide-pet hero-pet" data-pet="mimi" data-pose="wave" width="132" height="88" aria-hidden="true"></canvas>
+    <div class="hero-row"><figcaption id="hero-cap">One day of the sky over the lake, sped up.</figcaption></div>
   </figure>
 </section>
 
+<div class="ticker" aria-hidden="true"><div class="ticker-track">
+  <span>live sky</span><span>4 painted scenes</span><span>6 globs</span><span>real moon phase</span><span>seasons</span>
+  <span>live weather</span><span>pixel art</span><span>frosted glass cards</span><span>a settings app</span><span>MIT</span>
+  <span>live sky</span><span>4 painted scenes</span><span>6 globs</span><span>real moon phase</span><span>seasons</span>
+  <span>live weather</span><span>pixel art</span><span>frosted glass cards</span><span>a settings app</span><span>MIT</span>
+</div></div>
+
 <section id="looks" aria-labelledby="looks-h">
-  <h2 id="looks-h">Two looks, day and night</h2>
-  <p class="lead">The card palette follows the sky through the Catppuccin flavours: Mocha at night, Latte by day,
+  <p class="eyebrow">01 · the sky</p>
+  <h2 id="looks-h">Day and night</h2>
+  <p class="lead">The cards' colours follow the sky through the Catppuccin flavours: Mocha at night, Latte by day,
     in the accent colours you pick.</p>
-  <div class="switch">
-    <span role="group" aria-label="Card style"><button class="on" data-style="glass" aria-pressed="true">Glass</button><button data-style="cards" aria-pressed="false">Cards</button></span>
-    <span class="sep" aria-hidden="true"></span>
-    <span role="group" aria-label="Time of day"><button class="on" data-time="night" aria-pressed="true">Night</button><button data-time="day" aria-pressed="false">Day</button></span>
+  <div class="switch" role="group" aria-label="Time of day">
+    <button class="on" data-time="night" aria-pressed="true">Night</button><button data-time="day" aria-pressed="false">Day</button>
   </div>
-  <figure class="frame"><img id="look-img" src="art/demos/glass-night.jpg" alt="The glass style at night" width="1280" height="800" loading="lazy" decoding="async"></figure>
-  <p class="note">Glass: frosted liquid-glass panes over the wallpaper. Cards: solid Catppuccin cards.</p>
+  <figure class="window">
+    <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span id="look-title">living-sky · glass · night</span></div>
+    <img id="look-img" class="fade" src="art/demos/glass-night.jpg" alt="The glass cards over the lake at night" width="1280" height="800" loading="lazy" decoding="async">
+  </figure>
+  <div class="alt-style">
+    <img src="art/demos/cards-day-column.jpg" alt="The solid cards style, by day" width="430" height="1120" loading="lazy" decoding="async">
+    <p><b>Prefer solid cards?</b> Set <code>theme = cards</code> (or pick it in the settings app) for opaque Catppuccin
+      cards instead of frosted glass. Everything else stays the same.</p>
+  </div>
 </section>
 
 <section id="scenes" aria-labelledby="scenes-h">
-  <h2 id="scenes-h">Four painted scenes</h2>
-  <p class="lead">Each scene is a painting, traced once into layers and relit live for the hour, the season and the
-    weather. Snow settles only when it really snows (or in a high-latitude winter).</p>
+  <div class="sec-head">
+    <div>
+      <p class="eyebrow">02 · scenes</p>
+      <h2 id="scenes-h">Four painted scenes</h2>
+      <p class="lead">Each scene is a painting, traced once into layers and relit live for the hour, the season and
+        the weather. Snow settles only when it really snows (or in a high-latitude winter).</p>
+    </div>
+    <div class="guide"><canvas class="guide-pet" data-pet="pip" data-pose="curious" width="138" height="92" aria-hidden="true"></canvas>
+      <p class="bubble">Pick a scene, then open <b>Hour by hour</b>.</p></div>
+  </div>
   <div class="switch" role="tablist" aria-label="Scene">
     <button id="tab-scene-lake" class="on" data-scene="lake">Lake</button><button id="tab-scene-forest" data-scene="forest">Forest</button>
     <button id="tab-scene-city" data-scene="city">City</button><button id="tab-scene-camp" data-scene="camp">Camp</button>
   </div>
   <div id="scene-panel" role="tabpanel" aria-labelledby="tab-scene-lake">
     <p id="scene-text" class="note" aria-live="polite">Mountains over a lake with reflections; snow on the lit faces of the peaks in winter.</p>
-    <figure class="frame"><img id="scene-img" src="art/demos/scene-lake.jpg" alt="The lake scene at four times of day" width="1920" height="300" loading="lazy" decoding="async"></figure>
+    <figure class="window">
+      <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span id="scene-title">lake · night · dawn · midday · dusk</span></div>
+      <img id="scene-img" class="fade" src="art/demos/scene-lake.jpg" alt="The lake scene at four times of day" width="1920" height="300" loading="lazy" decoding="async">
+    </figure>
   </div>
   <details class="more" id="hours-details"><summary>Hour by hour (24 renders)</summary>
-    <img id="hours-img" src="art/demos/hours/lake.jpg" alt="The lake scene for every hour of a day" width="2400" height="1000" loading="lazy" decoding="async">
+    <div class="window"><div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>hour by hour · 24 renders</span></div>
+    <img id="hours-img" class="fade" src="art/demos/hours/lake.jpg" alt="The lake scene for every hour of a day" width="2400" height="1000" loading="lazy" decoding="async"></div>
   </details>
-  <figure class="wide">
+  <figure class="window spaced">
+    <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>seasons · spring · summer · autumn · winter</span></div>
     <img src="art/demos/seasons.jpg" alt="Every scene in spring, summer, autumn and winter" width="1920" height="1200" loading="lazy" decoding="async">
     <figcaption>Seasons, blended through the year for your hemisphere.</figcaption>
   </figure>
-  <div class="pixel-row">
-    <img src="art/demos/pixel.jpg" alt="Every scene as dithered pixel art" width="960" height="1200" loading="lazy" decoding="async">
-    <div><h3>Pixel mode</h3><p class="lead">Any scene as dithered pixel art: <code>pixel = on</code>.</p></div>
-  </div>
+  <figure class="window spaced">
+    <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>pixel = on · night, then dusk</span></div>
+    <img src="art/site/pixel-wide.jpg" alt="Every scene as dithered pixel art, at night and at dusk" width="1920" height="600" loading="lazy" decoding="async">
+    <figcaption>Pixel mode: any scene as dithered pixel art with <code>pixel = on</code>.</figcaption>
+  </figure>
 </section>
 
 <section id="pets" aria-labelledby="pets-h">
+  <p class="eyebrow">03 · the globs</p>
   <h2 id="pets-h">Meet the globs</h2>
-  <p class="lead">Pick one, a different one every day (<code>glob = random</code>), or the one that matches your scene
-    (<code>glob = scene</code>). They sleep, dance to music, watch videos, type along with you, wear sunglasses in
-    strong sun and masks when the air is bad, and get grumpy if you wake or ignore them. The same pet can sit in
-    your top panel too.</p>
+  <p class="lead">Six little pets that live on your cards. They sleep, dance to music, watch videos, type along with
+    you, wear sunglasses in strong sun and masks when the air is bad, and get grumpy if you wake or ignore them.</p>
+  <p class="note">Pick one, a different one every day (<code>glob = random</code>), or the one that matches your scene
+    (<code>glob = scene</code>). The same pet can sit in your top panel too.</p>
   <img class="lineup" src="art/glob/lineup.png" alt="The six globs in a row: Mimi, Pip, Bun, Nyx, Cubo and Ember" width="1560" height="310" loading="lazy" decoding="async">
-  <p class="note hint">Click a pet to see every mood.</p>
-  <div class="pets" id="pet-list"></div>
-  <noscript><p class="note">The pet picker needs JavaScript; the lineup above shows all six.</p></noscript>
-  <div class="pet-detail" id="pet-detail" inert>
-    <div class="pet-detail-inner">
-      <div class="pet-detail-body">
-        <div class="pet-info">
-          <h3 id="pet-name" tabindex="-1"></h3>
-          <p id="pet-text"></p>
-          <p class="tag" id="pet-tag"></p>
-          <button class="btn small" id="pet-close" type="button">Close</button>
+  <noscript><p class="note">The pet playground needs JavaScript; the lineup above shows all six.</p></noscript>
+  <div class="playground" id="playground" hidden>
+    <div class="pet-pick" id="pet-pick" role="radiogroup" aria-label="Choose a pet"></div>
+    <div class="play-grid">
+      <figure class="window stage-win">
+        <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span id="stage-title">playground · mimi</span></div>
+        <div class="stage">
+          <canvas id="stage" role="button" width="640" height="360" aria-label="Mimi. Press Enter to poke."></canvas>
         </div>
-        <div class="sheet" tabindex="0" role="group" aria-label="Showcase sheet, scrollable"><img id="pet-sheet" alt="" width="1360" height="2794" decoding="async"></div>
+        <figcaption><span id="pet-blurb"></span> <span class="tag" id="pet-tag"></span></figcaption>
+      </figure>
+      <div class="controls">
+        <p class="ctl-h">Do something</p>
+        <div class="chips" id="pet-acts"></div>
+        <p class="ctl-h">Mood and weather</p>
+        <div class="chips" id="pet-moods"></div>
+        <div id="pet-extra"></div>
+        <p class="note">Tip: click the pet to poke it. This is the same drawing code as the desktop and panel pet.</p>
+        <button class="btn small" id="pet-more" type="button" aria-expanded="false" aria-controls="pet-detail">Every look of Mimi</button>
+      </div>
+    </div>
+    <div class="pet-detail" id="pet-detail" inert>
+      <div class="pet-detail-inner">
+        <div class="pet-detail-body">
+          <div class="pet-info">
+            <h3 id="pet-name" tabindex="-1"></h3>
+            <p>Every mood, weather and action, drawn by the same code.</p>
+            <button class="btn small" id="pet-close" type="button">Close</button>
+          </div>
+          <div class="sheet" tabindex="0" role="group" aria-label="Showcase sheet, scrollable"><img id="pet-sheet" class="fade" alt="" width="1360" height="2794" decoding="async"></div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <section id="cards" aria-labelledby="cards-h">
-  <h2 id="cards-h">The cards</h2>
-  <p class="lead">Six on by default, four more you can switch on; they wrap into a second column when the screen
-    is full. Hardware is detected automatically.</p>
+  <div class="sec-head">
+    <div>
+      <p class="eyebrow">04 · cards</p>
+      <h2 id="cards-h">The cards</h2>
+      <p class="lead">Six on by default, four more you can switch on; they wrap into a second column when the screen
+        is full. Hardware is detected automatically.</p>
+    </div>
+    <div class="guide"><canvas class="guide-pet" data-pet="cubo" data-pose="read" width="138" height="92" aria-hidden="true"></canvas>
+      <p class="bubble">Use the arrow keys to flip through cards.</p></div>
+  </div>
   <div class="switch wrap" id="card-tabs" role="tablist" aria-label="Card"></div>
   <div id="card-panel" role="tabpanel" aria-labelledby="tab-card-clock">
-    <figure class="frame narrow"><div class="card-box"><img id="card-img" src="art/demos/cards/clock.jpg" alt="The clock card in both styles, night and day" width="1588" height="206" loading="lazy" decoding="async"></div>
-      <figcaption>Glass at night · glass by day · cards at night · cards by day.</figcaption></figure>
+    <figure class="window">
+      <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span id="card-title">card · clock · night | day</span></div>
+      <div class="card-stage"><img id="card-img" class="fade" src="art/site/cards/clock.jpg" alt="The clock card at night and by day" width="788" height="206" loading="lazy" decoding="async"></div>
+    </figure>
   </div>
   <details class="more"><summary>All ten cards at once, and the colour sets</summary>
-    <img src="art/demos/all-cards.jpg" alt="All ten cards" width="1280" height="800" loading="lazy" decoding="async">
-    <img src="art/demos/colors.jpg" alt="The colour sets through the day" width="1404" height="932" loading="lazy" decoding="async">
+    <div class="window"><div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>all ten cards</span></div>
+    <img src="art/demos/all-cards.jpg" alt="All ten cards" width="1280" height="800" loading="lazy" decoding="async"></div>
+    <div class="window"><div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>colour sets · through the day</span></div>
+    <img src="art/demos/colors.jpg" alt="The colour sets through the day" width="1404" height="932" loading="lazy" decoding="async"></div>
   </details>
   <p class="note">Making your own card is one small Lua file:
     <a href="https://github.com/SingletLinkage/living-sky/blob/main/lua/cards/README.md">lua/cards/README.md</a>.
@@ -149,7 +209,14 @@
 </section>
 
 <section id="install" aria-labelledby="install-h">
-  <h2 id="install-h">Install</h2>
+  <div class="sec-head">
+    <div>
+      <p class="eyebrow">05 · install</p>
+      <h2 id="install-h">Install</h2>
+    </div>
+    <div class="guide"><canvas class="guide-pet" data-pet="ember" data-pose="flare" width="138" height="92" aria-hidden="true"></canvas>
+      <p class="bubble">Three commands. That's it.</p></div>
+  </div>
   <div class="install-grid">
     <div class="install-main">
       <pre><code>git clone https://github.com/SingletLinkage/living-sky ~/living-sky
@@ -172,18 +239,19 @@ cd ~/living-sky
     </aside>
   </div>
   <h3>Uninstall</h3>
-  <pre data-no-copy><code>./uninstall.sh                # keeps your settings
+  <pre data-no-copy data-title="uninstall · pick one"><code>./uninstall.sh                # keeps your settings
 ./uninstall.sh --purge        # removes them too
 ./uninstall.sh --purge-deps   # also the fonts and conky the installer downloaded</code></pre>
 </section>
 
 <section id="configure" aria-labelledby="configure-h">
+  <p class="eyebrow">06 · configure</p>
   <h2 id="configure-h">Use and configure</h2>
   <p class="lead">Open <b>Living Sky</b> from your apps (or right-click the panel pet): pages for the look, colours and pet,
     cards, location, and the system side. It edits one plain file,
     <code>~/.config/living-sky/living-sky.conf</code>, keeping its comments, so editing it by hand works too;
     the running desktop picks up changes within about 5 seconds.</p>
-  <pre data-no-copy><code>living-sky start | stop | restart | status
+  <pre data-no-copy data-title="living-sky commands"><code>living-sky start | stop | restart | status
 living-sky settings              # the settings window
 living-sky set scene camp        # change one setting (set --list: all of them)
 living-sky get scene
@@ -206,7 +274,14 @@ living-sky preview --demo        # a PNG of your desktop with personal details h
 </section>
 
 <section id="privacy" aria-labelledby="privacy-h">
-  <h2 id="privacy-h">Privacy</h2>
+  <div class="sec-head">
+    <div>
+      <p class="eyebrow">07 · privacy</p>
+      <h2 id="privacy-h">Privacy</h2>
+    </div>
+    <div class="guide"><canvas class="guide-pet" data-pet="nyx" data-pose="stargaze" width="138" height="92" aria-hidden="true"></canvas>
+      <p class="bubble">No window titles, no keystrokes.</p></div>
+  </div>
   <ul>
     <li>Location: one IP lookup (ipinfo.io, falling back to ipapi.co) unless you set coordinates; then cached.</li>
     <li>Weather and air quality: <a href="https://open-meteo.com">Open-Meteo</a>, no account, every 15 minutes.</li>
@@ -228,7 +303,9 @@ living-sky preview --demo        # a PNG of your desktop with personal details h
 <footer class="site-footer">
   <div class="foot-grid">
     <div class="foot-brand"><a class="brand" href="#top">living-sky</a>
-      <p>A conky desktop for GNOME that follows the real sky.</p></div>
+      <p>A conky desktop for GNOME that follows the real sky.</p>
+      <div class="signoff"><canvas class="guide-pet" data-pet="bun" data-pose="sleep" width="138" height="92" aria-hidden="true"></canvas>
+        <p>A little sky, a little company.</p></div></div>
     <nav aria-label="Project"><p class="foot-h">Project</p><ul>
       <li><a href="https://github.com/SingletLinkage/living-sky">Source on GitHub</a></li>
       <li><a href="https://github.com/SingletLinkage/living-sky/blob/main/docs/how-it-works.md">How it works</a></li>
@@ -236,13 +313,12 @@ living-sky preview --demo        # a PNG of your desktop with personal details h
       <li><a href="https://github.com/SingletLinkage/living-sky/issues">Report a bug</a></li>
       <li><a href="https://github.com/SingletLinkage/living-sky/blob/main/LICENSE">MIT license</a></li></ul></nav>
     <nav aria-label="On this page"><p class="foot-h">On this page</p><ul>
-      <li><a href="#looks">Looks</a></li><li><a href="#scenes">Scenes</a></li><li><a href="#pets">Pets</a></li>
+      <li><a href="#looks">Sky</a></li><li><a href="#scenes">Scenes</a></li><li><a href="#pets">Pets</a></li>
       <li><a href="#cards">Cards</a></li><li><a href="#install">Install</a></li><li><a href="#configure">Configure</a></li>
       <li><a href="#privacy">Privacy</a></li></ul></nav>
     <div><p class="foot-h">Credits</p><ul>
       <li>Colours by <a href="https://github.com/catppuccin/catppuccin">Catppuccin</a> (MIT)</li>
       <li>Scene paintings generated with Google Gemini and traced into layers</li>
-      <li>Pet behaviour partly inspired by <a href="https://github.com/miflow13/mochi-desktop">mochi-desktop</a> (MIT)</li>
       <li>Weather by <a href="https://open-meteo.com">Open-Meteo</a></li></ul></div>
   </div>
   <div class="foot-base">
@@ -250,7 +326,10 @@ living-sky preview --demo        # a PNG of your desktop with personal details h
     <a class="to-top" href="#top">Back to top ↑</a>
   </div>
 </footer>
+<span class="sr" id="pet-live" role="status" aria-live="polite"></span>
 <span id="copy-status" class="sr" role="status" aria-live="polite"></span>
+<script src="cairo-shim.js"></script>
+<script src="pets.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

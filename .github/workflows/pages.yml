@@ -26,7 +26,7 @@ jobs:
           mkdir -p _site/art
           cp site/* _site/
           cp app/living-sky.svg _site/icon.svg
-          cp -r art/demos art/glob _site/art/
+          cp -r art/demos art/glob art/site _site/art/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

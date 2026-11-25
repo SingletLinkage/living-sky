@@ -49,14 +49,18 @@ lua/lib/          ui.lua (drawing kit), sys.lua (/proc, /sys readers, hardware d
 lua/glob/         the pets: core.lua (shared behaviour + drawing), pick.lua, one file per pet, README.md
 themes/           glass/ and cards/: conky.conf + a 4-line style selector
 art/              <scene>/ (source picture + traced layers), demos/ (previews), glob/<pet>/
-gnome-extension/  glob@living-sky: the panel pet (pets/<pet>.js); esm/ + build-esm.py for GNOME 45+
-site/             the project website (deployed with art/ by .github/workflows/pages.yml)
+gnome-extension/  glob@living-sky: the panel pet (pets/<pet>.js); esm/ + build-esm.py for GNOME 45+;
+                  build-web.py bundles the same pets for the website (site/pets.js)
+site/             the project website: index.html, style.css, app.js, cairo-shim.js (cairo on a canvas) and the
+                  generated pets.js; deployed with art/ by .github/workflows/pages.yml
+art/site/         website-only images, made from art/demos by tools/sitemedia.py
 tests/            pytest suite (run by .github/workflows/ci.yml)
 tools/            previews (scenesheet, seasonsheet, daysheet, media.sh, cardshots.sh), art tracing
 docs/             how-it-works.md
 ```
-Preview the website locally: copy `site/*` and `art/demos`, `art/glob` into one folder (as the workflow does) and
-open `index.html`.
+Preview the website locally: copy `site/*` and `art/demos`, `art/glob`, `art/site` into one folder (as the workflow
+does) and open `index.html`. After changing a pet, run `gnome-extension/build-web.py` (the tests check `site/pets.js`
+is current); after new card shots or pixel sheets, run `tools/sitemedia.py`.
 
 ## Style
 - Plain, readable code with short comments that say *why*; match what is around you.

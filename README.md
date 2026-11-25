@@ -67,7 +67,6 @@ Bug reports, cards, pets and scenes are welcome: see [CONTRIBUTING.md](CONTRIBUT
 - Colours: [Catppuccin](https://github.com/catppuccin/catppuccin) (MIT).
 - The scene paintings were generated with Google Gemini and traced into layers (`tools/trace_ridges.py`,
   `tools/trace_scenes.py`).
-- Pet behaviour ideas partly inspired by [mochi-desktop](https://github.com/miflow13/mochi-desktop) (no code or art copied).
 
 ## License
 [MIT](LICENSE). The art in `art/` is covered by the same license.
