@@ -185,7 +185,6 @@ safe('scenes', () => {
 // Cards (glass only, night | day)
 const CARDS = ['clock', 'weather', 'calendar', 'media', 'cpu', 'memory', 'disks', 'gpu', 'battery', 'network'];
 safe('cards', () => {
-  const HEIGHT = {battery: 184, calendar: 234, clock: 206, cpu: 192, disks: 152, gpu: 162, media: 162, memory: 196, network: 162, weather: 190};
   const NAME = {cpu: 'CPU', gpu: 'GPU', media: 'Now playing'};
   const tabs = $('#card-tabs'), img = $('#card-img');
   CARDS.forEach((c, i) => {
@@ -197,7 +196,6 @@ safe('cards', () => {
     tabs.appendChild(b);
   });
   tablist(tabs, $('#card-panel'), 'card', c => {
-    img.height = HEIGHT[c];
     swap(img, `art/site/cards/${c}.jpg`, `The ${(NAME[c] || c).toLowerCase()} card at night and by day`);
     $('#card-title').textContent = `card · ${c} · night | day`;
   });

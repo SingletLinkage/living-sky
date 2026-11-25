@@ -69,8 +69,6 @@ figure { margin: 0; }
 .hero { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; align-items: center; padding-top: 48px; }
 .hero-text .lead { margin-bottom: 0; }
 .cta { display: flex; gap: 12px; margin: 22px 0 14px; flex-wrap: wrap; }
-.facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.facts li { margin: 0; padding: 3px 12px; font-size: 14px; color: var(--subtext); background: var(--glass); border: 1px solid var(--line); border-radius: 999px; }
 .btn {
   display: inline-block; padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line);
   background: var(--glass); color: var(--text); font-weight: 600; cursor: pointer; font: inherit; font-weight: 600;
@@ -112,9 +110,9 @@ html:not(.js) .switch { display: none; }
 .window.spaced { margin-top: 28px; }
 .fade { transition: opacity .25s ease; }
 .fade.fading { opacity: 0; }
-.card-stage { display: grid; place-items: center; padding: clamp(16px, 4vw, 36px) 16px; min-height: 190px;
+.card-stage { display: grid; place-items: center; padding: clamp(16px, 4vw, 36px) 16px;
   background: radial-gradient(120% 140% at 30% 0%, #313244 0%, #181825 60%, #11111b 100%); }
-.card-stage img { border-radius: 10px; width: auto; max-width: 100%; }
+.card-stage img { width: min(788px, 100%); height: auto; aspect-ratio: 788 / 234; object-fit: contain; border-radius: 10px; }
 .alt-style { display: grid; grid-template-columns: 72px 1fr; gap: 16px; align-items: center; margin-top: 18px; max-width: none;
   background: var(--glass); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
 .alt-style img { width: 72px; height: 120px; object-fit: cover; object-position: top; border-radius: 8px; border: 1px solid var(--line); }
@@ -137,14 +135,6 @@ html:not(.js) .switch { display: none; }
 .signoff { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
 .signoff p { margin: 0; font-style: italic; }
 
-/* the keyword band under the hero */
-.ticker { overflow: hidden; margin: clamp(40px, 6vw, 64px) 0 0; border-block: 1px solid var(--line);
-  background: color-mix(in srgb, var(--crust) 60%, transparent); }
-.ticker-track { display: flex; width: max-content; gap: 0; animation: ticker 38s linear infinite; }
-.ticker:hover .ticker-track { animation-play-state: paused; }
-.ticker-track span { padding: 12px 22px; font: 600 14px "JetBrains Mono", ui-monospace, monospace; color: var(--subtext); white-space: nowrap; }
-.ticker-track span::after { content: "✦"; margin-left: 44px; color: var(--accent); }
-@keyframes ticker { to { transform: translateX(-50%); } }
 
 .grid { display: grid; gap: 20px; margin-top: 24px; }
 .grid.two { grid-template-columns: 1fr 1fr; }
@@ -276,8 +266,6 @@ main ul { padding-left: 20px; } li { margin: 4px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .ticker-track { animation: none; width: auto; flex-wrap: wrap; justify-content: center; }
-  .ticker-track span:nth-child(n+6) { display: none; }
   .pet-detail, .pet-detail.open { transition: none !important; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
 }
@@ -291,9 +279,7 @@ main ul { padding-left: 20px; } li { margin: 4px 0; }
 .story b { color: var(--text); }
 .features { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .features li { margin: 0; display: grid; grid-template-columns: 52px 1fr; grid-template-rows: auto auto; column-gap: 14px; align-items: center;
-  padding: 14px 16px; background: var(--glass); border: 1px solid var(--line); border-radius: 14px;
-  transition: border-color .2s, transform .2s; }
-.features li:hover { border-color: var(--accent); transform: translateY(-2px); }
+  padding: 14px 16px; background: var(--glass); border: 1px solid var(--line); border-radius: 14px; }
 .features img { grid-row: span 2; width: 52px; height: 52px; border-radius: 0; }
 .features b { font-size: 15px; }
 .features span { color: var(--subtext); font-size: 14px; line-height: 1.45; }
