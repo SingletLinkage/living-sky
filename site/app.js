@@ -118,7 +118,7 @@ safe('reveal', () => {
 // Hero: a static poster first, the 3.5 MB animation after load, and a pause/play button
 safe('hero', () => {
   const img = $('#hero-img'), cap = $('#hero-cap'), fig = $('#hero-media');
-  const poster = {src: img.getAttribute('src'), alt: img.alt, cap: 'The lake at night with frosted cards. Press play to watch a day pass.'};
+  const poster = {src: img.getAttribute('src'), alt: img.alt, cap: 'The lake at night with frosted cards.'};
   const gif = {src: img.dataset.gif, alt: 'A day of the living sky, from night through sunrise and noon to sunset', cap: cap.textContent};
   const btn = document.createElement('button');
   btn.type = 'button'; btn.className = 'btn small';
@@ -255,27 +255,52 @@ function drawPose(ctx, w, h, id, poseName) {
 safe('pets', () => {
   if (!P || !LSC) { document.documentElement.classList.add('no-pets'); return; }
 
-  // guides beside the section headings: a still pose; a little hop when you point at them
+  // guides beside the section headings (and Mimi in the header): alive while on screen (blinks, glances,
+  // their pose every few seconds), a hop when you point at them; one still frame under reduced motion
+  const guides = [];
   document.querySelectorAll('canvas.guide-pet').forEach(cv => {
-    const w = +cv.getAttribute('width'), h = +cv.getAttribute('height'), id = cv.dataset.pet, pose = cv.dataset.pose;
+    const w = +cv.getAttribute('width'), h = +cv.getAttribute('height'), id = cv.dataset.pet, pose = POSES[cv.dataset.pose] || {};
     const ctx = fitCanvas(cv, w, h);
-    drawPose(ctx, w, h, id, pose);
+    drawPose(ctx, w, h, id, cv.dataset.pose);
     if (calm) return;
-    const host = cv.closest('.guide, .hero-media, .signoff') || cv;
-    let busy = false;
+    const g = {cv, ctx, w, h, id, pose, S: petState(id, pose.S), A: P.newAnim(), next: 0, seen: false};
+    guides.push(g);
+    const host = cv.closest('.guide, .hero-media, .signoff, .brand') || cv;
     host.addEventListener('pointerenter', () => {
-      if (busy || pose === 'sleep') return;
-      busy = true;
-      const S = petState(id, {act: 'hop', act_dur: 1.0, act_id: 1}), A = P.newAnim();
-      const t0 = performance.now() / 1000;
-      const frame = () => {
-        const t = performance.now() / 1000 - t0;
-        drawInto(ctx, w, h, id, S, A, 10 + t);
-        if (t < 1.1) requestAnimationFrame(frame); else { drawPose(ctx, w, h, id, pose); busy = false; }
-      };
-      requestAnimationFrame(frame);
+      if (pose.S && pose.S.mood === 'sleep') return;
+      const t = performance.now() / 1000;
+      Object.assign(g.S, {act: 'hop', act_dur: 1.0}); g.S.act_id += 1; g.next = t + 1.2 + 3 * Math.random();
     });
   });
+  if (guides.length) {
+    let graf = 0, glast = 0;
+    const gloop = now => {
+      graf = 0;
+      if (document.hidden || !guides.some(g => g.seen)) return;
+      graf = requestAnimationFrame(gloop);
+      if (now - glast < 50) return;            // ~20 fps is plenty for a blink and a bob
+      glast = now;
+      const t = now / 1000;
+      guides.forEach(g => {
+        if (!g.seen) return;
+        if (g.pose.act && t >= g.next) {        // do the pose again every few seconds
+          Object.assign(g.S, {act: g.pose.act, act_dur: g.pose.dur}); g.S.act_id += 1;
+          g.next = t + g.pose.dur + 3 + 4 * Math.random();
+        }
+        drawInto(g.ctx, g.w, g.h, g.id, g.S, g.A, t);
+      });
+    };
+    const gkick = () => { if (!graf) graf = requestAnimationFrame(gloop); };
+    if ('IntersectionObserver' in window) {
+      const gio = new IntersectionObserver(es => {
+        es.forEach(e => { const g = guides.find(x => x.cv === e.target); if (g) g.seen = e.isIntersecting; });
+        gkick();
+      });
+      guides.forEach(g => gio.observe(g.cv));
+    } else guides.forEach(g => { g.seen = true; });
+    document.addEventListener('visibilitychange', gkick);
+    gkick();
+  }
 
   // the playground
   const pg = $('#playground'); pg.hidden = false;
