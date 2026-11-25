@@ -107,6 +107,9 @@ by day, a warm tint around sunrise and sunset, and sky-coloured haze on the dist
   with a shadowed doorway. From dusk to dawn the fire burns (flames change shape every hour, embers rise,
   the clearing glows); smoke always; fireflies on summer nights.
 
+HiDPI: the engine lays the cards and the pet out in logical pixels (screen / `scale`) and draws them scaled, so
+text stays sharp; `scale = auto` uses GNOME's scaling factor when one is set, else 2 on screens 2000+ px tall.
+
 Every scene is drawn at 1920x1200, then fitted to the primary monitor (`sky.fit_screen`): cropped to the
 screen's shape around the scene's focus (`scenes.FOCUS`: wider screens lose mostly sky from the top, narrower
 ones the sides) and scaled to its exact size, so GNOME shows it 1:1 and the cards' frost lines up. Renders for

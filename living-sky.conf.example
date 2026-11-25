@@ -45,6 +45,10 @@ units = metric
 # Clock (and sunrise / sunset) format: 24h | 12h. Weekday and month names follow your system language.
 clock = 24h
 
+# Size of the cards and the pet on HiDPI screens: auto | a factor such as 1.25, 1.5, 2 (or 150%).
+#   auto uses GNOME's scaling factor when one is set, else 2 on screens 2000+ px tall.
+scale = auto
+
 # ── Cards ─────────────────────────────────────────────────────────────────────────
 # Show (on) or hide (off) each card. Hidden cards aren't loaded at all, so they cost nothing.
 # Cards that don't apply to your machine hide themselves (e.g. gpu without an NVIDIA GPU).

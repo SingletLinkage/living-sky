@@ -9,8 +9,6 @@
 - **CI:** shellcheck runs at error level only; raise it to warnings once those are cleaned up.
 
 ## Display & desktop reach
-- **HiDPI:** `scale = auto | <number>` (GNOME `scaling-factor`, or screen height / 1080) for the cards, fonts
-  and the pet; today everything is in raw pixels, so 4K / 200 % looks small.
 - **Sharper on big screens:** wallpapers now fit the screen's size and shape, but are drawn at 1920x1200 first,
   so a 4K screen gets a 2x upscale. Drawing the scenes in resolution-independent coordinates would fix it.
 - **Multiple monitors:** `monitor = primary | <xrandr name>`; list the outputs in `living-sky doctor`.

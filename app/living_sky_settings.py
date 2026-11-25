@@ -300,6 +300,9 @@ class Settings(Adw.PreferencesWindow):
             self.theme_pic.pic.set_filename(os.path.join(ART, 'demos', '%s-night.jpg' % v))
             self.set('theme', v)
         g.add(combo('Style', None, THEMES, theme, on_theme))
+        g.add(combo('Size', 'Make the cards and the pet bigger on HiDPI screens',
+                    [('auto', 'Automatic', ''), ('1', '100 %', ''), ('1.25', '125 %', ''), ('1.5', '150 %', ''),
+                     ('1.75', '175 %', ''), ('2', '200 %', '')], self.get('scale', 'auto'), lambda v: self.set('scale', v)))
         page.add(g)
         return page
 

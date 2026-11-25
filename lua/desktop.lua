@@ -48,8 +48,10 @@ M.shadow_a, M.glass_a1, M.glass_a2 = 0.35, 0.86, 0.90
 -- screen (primary monitor) size, passed in by bin/living-sky. core/sky.py renders the wallpaper at this size
 -- (older renders may be 1920x1200); GNOME shows it with 'zoom' (cover + centre), so the glass frost is mapped
 -- the same way, from the size of the picture actually loaded (set_art)
-local SW = tonumber(os.getenv('LIVING_SKY_W') or '') or 1920
-local SH = tonumber(os.getenv('LIVING_SKY_H') or '') or 1200
+local PW = tonumber(os.getenv('LIVING_SKY_W') or '') or 1920     -- physical pixels
+local PH = tonumber(os.getenv('LIVING_SKY_H') or '') or 1200
+local SW, SH = PW, PH            -- logical pixels: the layout works in these (PW / UI, set after the config)
+local UI = 1                     -- HiDPI scale (`scale` in living-sky.conf)
 local ART_W, ART_H, ZK, ZX, ZY
 local function set_art(w, h)
   ART_W, ART_H = w, h
@@ -58,7 +60,7 @@ local function set_art(w, h)
 end
 set_art(1920, 1200)
 local COL_W = 360
-local COL_X = SW - COL_W - 30     -- card column, 30 px from the right edge (icons live on the left)
+local COL_X                      -- card column, 30 px from the right edge (icons live on the left); see ui_scale
 ------------------------------------------------------------------ config (living-sky.conf)
 -- One flat 'key = value' file; '#' starts a comment (but '#rrggbb' colours are values).
 local function conf_read()              -- -> settings table, file text
@@ -78,6 +80,24 @@ local function cfg_on(key, default)     -- on/off switches: on | off | yes | no 
   local v = (CFG[key] or ''):lower()
   if v == '' then return default end
   return v == 'on' or v == 'yes' or v == 'true' or v == '1'
+end
+
+-- HiDPI: `scale = auto | <number>`. auto: GNOME's scaling factor when one is set, else 2 on screens 2000+ px
+-- tall. Everything is laid out in logical pixels (screen / UI) and drawn scaled by UI.
+do
+  local v = (CFG.scale or 'auto'):lower():gsub('%s', '')
+  local n = tonumber((v:gsub('%%$', '')))
+  if n and v:find('%%$') then n = n / 100 end
+  if n then UI = math.max(0.75, math.min(3, n))
+  else
+    local h = io.popen('gsettings get org.gnome.desktop.interface scaling-factor 2>/dev/null')
+    local f = h and tonumber(((h:read('*a') or ''):match('(%d+)%s*$'))) or 0
+    if h then h:close() end
+    UI = (f and f >= 1) and f or (PH >= 2000 and 2 or 1)
+  end
+  SW, SH = math.floor(PW / UI + 0.5), math.floor(PH / UI + 0.5)
+  COL_X = SW - COL_W - 30
+  set_art(ART_W, ART_H)
 end
 
 -- the glob pet (lua/glob/<pet>.lua) perches on the first card; `glob = off` hides it,
@@ -165,7 +185,7 @@ end
 function detected_write()
   local f = io.open(SKYDIR .. 'detected', 'w')
   if f then
-    f:write(string.format('style %s · screen %dx%d · pet %s · colors %s\n', STYLE, SW, SH, PET, CFG.colors or 'auto'))
+    f:write(string.format('style %s · screen %dx%d (scale %g) · pet %s · colors %s\n', STYLE, PW, PH, UI, PET, CFG.colors or 'auto'))
     f:write('cards (in order):\n')
     for _, c in ipairs(ACTIVE) do
       local ok, sub = pcall(function() return type(c.subtitle) == 'function' and c.subtitle(D) or c.subtitle end)
@@ -356,7 +376,7 @@ local function slot_key(t)
   return string.format('%04d%02d%02d%02d%02d', d.year, d.month, d.day, math.floor(m / 60), m % 60)
     .. (sky.scene == 'lake' and '' or ('-' .. sky.scene)) .. (sky.season and ('-' .. sky.season) or '')
     .. (cfg_on('pixel', false) and '-px' or '')
-    .. ((SW == 1920 and SH == 1200) and '' or string.format('-%dx%d', SW, SH))   -- same rule as core/sky.py
+    .. ((PW == 1920 and PH == 1200) and '' or string.format('-%dx%d', PW, PH))   -- same rule as core/sky.py
 end
 local function apply_palette(path)
   local ok, p = pcall(dofile, path)
@@ -637,30 +657,36 @@ function conky_living_sky_main()
   -- the cards only change once per sample: render them into a cached layer then, and
   -- each frame just composite that layer plus the animated blob
   if not card_layer then
-    local ok, ls = pcall(cairo_surface_create_similar, cs, CAIRO_CONTENT_COLOR_ALPHA, SW - LAYER_X, SH)
+    local ok, ls = pcall(cairo_surface_create_similar, cs, CAIRO_CONTENT_COLOR_ALPHA, math.ceil((SW - LAYER_X) * UI), PH)
     if ok and ls then card_layer, fresh = ls, true end
   end
   if card_layer and cards_min_x - 140 < LAYER_X then   -- cards wrapped into another column: widen the layer
     cairo_surface_destroy(card_layer); card_layer = nil
     LAYER_X = math.max(0, cards_min_x - 140)
-    local ok, ls = pcall(cairo_surface_create_similar, cs, CAIRO_CONTENT_COLOR_ALPHA, SW - LAYER_X, SH)
+    local ok, ls = pcall(cairo_surface_create_similar, cs, CAIRO_CONTENT_COLOR_ALPHA, math.ceil((SW - LAYER_X) * UI), PH)
     if ok and ls then card_layer, fresh = ls, true end
   end
   if card_layer and fresh then
     use(cairo_create(card_layer))
     cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR); cairo_paint(cr); cairo_set_operator(cr, CAIRO_OPERATOR_OVER)
+    cairo_scale(cr, UI, UI)
     cairo_translate(cr, -LAYER_X, 0)
     draw()
     cairo_destroy(cr)
   end
   use(cairo_create(cs))
+  cairo_scale(cr, UI, UI)                         -- logical pixels from here on
   presence_read()
   local mctx = glob_begin()
   if mctx and GLOB.export then                    -- state for the GNOME panel extension (written on change)
     gcall(function() GLOB.export(SKYDIR .. 'glob.json', M, sky.info, wx.data) end)
   end
   if mctx then gcall(GLOB.draw_behind, mctx) end
-  if card_layer then cairo_set_source_surface(cr, card_layer, LAYER_X, 0); cairo_paint(cr) else draw() end
+  if card_layer then                              -- the layer is in physical pixels
+    cairo_save(cr); cairo_identity_matrix(cr)
+    cairo_set_source_surface(cr, card_layer, math.floor(LAYER_X * UI + 0.5), 0); cairo_paint(cr)
+    cairo_restore(cr)
+  else draw() end
   if mctx then gcall(GLOB.draw_front, mctx) end
   cairo_destroy(cr); cairo_surface_destroy(cs); cr = nil
 
@@ -672,13 +698,15 @@ function conky_living_sky_main()
     glob_load()
     local wall = cairo_image_surface_create_from_png(sky.wall or (ROOT .. 'art/lake/wallpaper-static.png'))
     set_art(cairo_image_surface_get_width(wall), cairo_image_surface_get_height(wall))
-    local img = cairo_image_surface_create(CAIRO_FORMAT_RGB24, SW, SH)
+    local img = cairo_image_surface_create(CAIRO_FORMAT_RGB24, PW, PH)
     use(cairo_create(img))                                 -- the wallpaper as GNOME shows it (zoom)
+    cairo_scale(cr, UI, UI)
     cairo_translate(cr, ZX, ZY); cairo_scale(cr, ZK, ZK)
     cairo_set_source_surface(cr, wall, 0, 0); cairo_paint(cr)
     cairo_destroy(cr); cairo_surface_destroy(wall)
     FROST_SRC = frost.img
     use(cairo_create(img))
+    cairo_scale(cr, UI, UI)
     local pm = glob_begin()
     if pm then gcall(GLOB.draw_behind, pm) end
     draw()
@@ -689,7 +717,9 @@ function conky_living_sky_main()
     os.rename(flag .. '.png.tmp', flag .. '.png')
     local rf = io.open(flag .. '.rects', 'w')        -- where each card is, for tools/cardshots.sh
     if rf then
-      for _, r in ipairs(last_rects) do rf:write(string.format('%s %d %d %d %d\n', r.id, r.x, r.y, r.w, r.h)) end
+      for _, r in ipairs(last_rects) do          -- in the PNG's (physical) pixels
+        rf:write(string.format('%s %d %d %d %d\n', r.id, r.x * UI, r.y * UI, r.w * UI, r.h * UI))
+      end
       rf:close()
     end
     D.demo = false
