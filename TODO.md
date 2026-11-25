@@ -11,9 +11,8 @@
 ## Display & desktop reach
 - **HiDPI:** `scale = auto | <number>` (GNOME `scaling-factor`, or screen height / 1080) for the cards, fonts
   and the pet; today everything is in raw pixels, so 4K / 200 % looks small.
-- **Render at the screen size:** the sky and scenes are drawn at 1920x1200 and zoomed by GNOME. Ultrawide
-  screens crop the scene's foreground; small laptops render more than they need. Keep each scene's focal
-  part (the campfire, the street lamps) in frame for any aspect.
+- **Sharper on big screens:** wallpapers now fit the screen's size and shape, but are drawn at 1920x1200 first,
+  so a 4K screen gets a 2x upscale. Drawing the scenes in resolution-independent coordinates would fix it.
 - **Multiple monitors:** `monitor = primary | <xrandr name>`; list the outputs in `living-sky doctor`.
 - **Card layout:** column side (left / right), width, top offset, margins.
 - **Wayland and other desktops:** wallpaper backends beyond gsettings (KDE `plasma-apply-wallpaperimage`,

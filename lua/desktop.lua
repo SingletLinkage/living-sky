@@ -45,13 +45,18 @@ local M = {
 M.accent, M.accent2, M.shadow = hex('#b4befe'), hex('#fab387'), hex('#11111b')
 M.shadow_a, M.glass_a1, M.glass_a2 = 0.35, 0.86, 0.90
 ------------------------------------------------------------------ layout
--- screen (primary monitor) size, passed in by bin/living-sky; the wallpaper art is 1920x1200 and
--- GNOME shows it with 'zoom' (cover + centre), so the glass frost is mapped the same way
+-- screen (primary monitor) size, passed in by bin/living-sky. core/sky.py renders the wallpaper at this size
+-- (older renders may be 1920x1200); GNOME shows it with 'zoom' (cover + centre), so the glass frost is mapped
+-- the same way, from the size of the picture actually loaded (set_art)
 local SW = tonumber(os.getenv('LIVING_SKY_W') or '') or 1920
 local SH = tonumber(os.getenv('LIVING_SKY_H') or '') or 1200
-local ART_W, ART_H = 1920, 1200
-local ZK = math.max(SW / ART_W, SH / ART_H)
-local ZX, ZY = (SW - ART_W * ZK) / 2, (SH - ART_H * ZK) / 2
+local ART_W, ART_H, ZK, ZX, ZY
+local function set_art(w, h)
+  ART_W, ART_H = w, h
+  ZK = math.max(SW / ART_W, SH / ART_H)
+  ZX, ZY = (SW - ART_W * ZK) / 2, (SH - ART_H * ZK) / 2
+end
+set_art(1920, 1200)
 local COL_W = 360
 local COL_X = SW - COL_W - 30     -- card column, 30 px from the right edge (icons live on the left)
 ------------------------------------------------------------------ config (living-sky.conf)
@@ -351,6 +356,7 @@ local function slot_key(t)
   return string.format('%04d%02d%02d%02d%02d', d.year, d.month, d.day, math.floor(m / 60), m % 60)
     .. (sky.scene == 'lake' and '' or ('-' .. sky.scene)) .. (sky.season and ('-' .. sky.season) or '')
     .. (cfg_on('pixel', false) and '-px' or '')
+    .. ((SW == 1920 and SH == 1200) and '' or string.format('-%dx%d', SW, SH))   -- same rule as core/sky.py
 end
 local function apply_palette(path)
   local ok, p = pcall(dofile, path)
@@ -376,6 +382,7 @@ local function frost_load(path)
   local s = cairo_image_surface_create_from_png(path)
   if cairo_surface_status(s) ~= CAIRO_STATUS_SUCCESS then cairo_surface_destroy(s); return false end
   frost.img, frost.path = s, path
+  set_art(cairo_image_surface_get_width(s), cairo_image_surface_get_height(s))
   return true
 end
 local function sky_spawn(args)
@@ -664,6 +671,7 @@ function conky_living_sky_main()
     D.demo = req:find('demo') ~= nil       -- `living-sky preview --demo`: placeholders for personal details
     glob_load()
     local wall = cairo_image_surface_create_from_png(sky.wall or (ROOT .. 'art/lake/wallpaper-static.png'))
+    set_art(cairo_image_surface_get_width(wall), cairo_image_surface_get_height(wall))
     local img = cairo_image_surface_create(CAIRO_FORMAT_RGB24, SW, SH)
     use(cairo_create(img))                                 -- the wallpaper as GNOME shows it (zoom)
     cairo_translate(cr, ZX, ZY); cairo_scale(cr, ZK, ZK)

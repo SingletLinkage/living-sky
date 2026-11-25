@@ -33,6 +33,9 @@ from PIL import Image
 SCENES = ('lake', 'forest', 'city', 'camp')
 SEASONS = ('spring', 'summer', 'autumn', 'winter')
 ART = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'art')
+# what to keep when the screen isn't 16:10 (sky.fit_screen): the x to centre on for narrower screens, and how
+# much of the cut to take from the top for wider ones (1 = only sky, 0 = only ground)
+FOCUS = {'lake': (960, 0.7), 'forest': (820, 0.7), 'city': (960, 0.8), 'camp': (980, 0.85)}
 LUMA = np.array([0.299, 0.587, 0.114], np.float32)
 
 

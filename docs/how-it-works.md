@@ -107,6 +107,11 @@ by day, a warm tint around sunrise and sunset, and sky-coloured haze on the dist
   with a shadowed doorway. From dusk to dawn the fire burns (flames change shape every hour, embers rise,
   the clearing glows); smoke always; fireflies on summer nights.
 
+Every scene is drawn at 1920x1200, then fitted to the primary monitor (`sky.fit_screen`): cropped to the
+screen's shape around the scene's focus (`scenes.FOCUS`: wider screens lose mostly sky from the top, narrower
+ones the sides) and scaled to its exact size, so GNOME shows it 1:1 and the cards' frost lines up. Renders for
+other sizes are cached with the size in the name (`<slot>...-3440x1440.png`).
+
 `pixel = on` turns any scene into pixel art: the finished wallpaper is reduced to 4x4 blocks and 14 levels per
 channel with ordered (Bayer) dithering, so gradients stay smooth (renders cached as `<slot>...-px.png`).
 

@@ -31,3 +31,13 @@ def test_scene_renders(scene, when, season):
 def test_pixel_blocks():
     img = frame('lake', '2026-07-01 20:00', 'summer', pixel=True)
     assert (img[0::4] == img[1::4]).all() and (img[:, 0::4] == img[:, 3::4]).all()   # 4x4 blocks
+
+
+@pytest.mark.parametrize('size', [(3440, 1440), (1920, 1080), (1366, 768), (1280, 1024), (3840, 2400)])
+def test_fit_screen(size):
+    """Renders come out at the screen's exact size and shape (cropped around each scene's focus)."""
+    from PIL import Image
+    img = Image.fromarray(frame('camp', '2026-07-01 22:00', 'summer'))
+    out = sky.fit_screen(img, 'camp', size)
+    assert out.size == size
+    assert sky.fit_screen(img, 'camp', (sky.W, sky.H)) is img        # 1920x1200: untouched

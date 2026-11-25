@@ -105,7 +105,7 @@ start() {
         "$ROOT/themes/$theme/conky.conf" > "$cc"
     echo "$theme" > "$CACHE/theme"
     # render the current slot if missing (and its frost image), in the background
-    (nice -n 10 python3 "$ROOT/core/sky.py" --now >> "$CACHE/render.log" 2>&1 &)
+    (LIVING_SKY_W=$w LIVING_SKY_H=$h nice -n 10 python3 "$ROOT/core/sky.py" --now >> "$CACHE/render.log" 2>&1 &)
     LIVING_SKY_W=$w LIVING_SKY_H=$h setsid -f "$ROOT/bin/living-sky-run" "$cc" > /dev/null 2>&1 < /dev/null
     echo "living-sky: started ($theme)"
 }

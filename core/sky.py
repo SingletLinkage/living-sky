@@ -728,10 +728,37 @@ def scene_name(v=None):
     return v if v in scenes.SCENES else 'lake'
 
 def slot_suffix(scene):
-    """Cache-name suffix: the scene (not for the lake) and a season set by hand (not for auto)."""
+    """Cache-name suffix: the scene (not for the lake), a season set by hand (not for auto), pixel art, and
+    the screen size when it isn't the 1920x1200 the scenes are drawn at."""
     v = (read_conf().get('season') or 'auto').strip().lower()
+    sw, sh = screen_size()
     return (('' if scene == 'lake' else '-' + scene) + ('-' + v if v in SEASON_NAMES else '')
-            + ('-px' if pixel_on() else ''))
+            + ('-px' if pixel_on() else '') + ('' if (sw, sh) == (W, H) else '-%dx%d' % (sw, sh)))
+
+def screen_size():
+    """The primary monitor's size (LIVING_SKY_W / _H, passed down by bin/living-sky), else 1920x1200."""
+    sw = int(num(os.environ.get('LIVING_SKY_W'), W, lo=320, hi=7680))
+    sh = int(num(os.environ.get('LIVING_SKY_H'), H, lo=240, hi=4320))
+    return sw, sh
+
+def fit_screen(img, scene, size, pixel=False):
+    """The 1920x1200 render, cropped to the screen's shape and scaled to its size. The crop keeps what matters
+    in each scene (scenes.FOCUS: the campfire, the street lamps, the shore): wider screens lose sky from the
+    top more than ground from the bottom; narrower ones lose the sides around the scene's focus."""
+    sw, sh = size
+    if (sw, sh) == img.size:
+        return img
+    fx, keep_bottom = scenes.FOCUS.get(scene, (W / 2, 0.75))
+    if sw / sh > W / H:                                  # wider: full width, a band of rows
+        ch = round(W * sh / sw)
+        y0 = round((H - ch) * keep_bottom)
+        box = (0, y0, W, y0 + ch)
+    else:                                                # narrower: full height, a band of columns
+        cw = round(H * sw / sh)
+        x0 = int(min(max(fx - cw / 2, 0), W - cw))
+        box = (x0, 0, x0 + cw, H)
+    out = img.crop(box)
+    return out.resize((sw, sh), Image.NEAREST if pixel else Image.LANCZOS)
 
 def pixel_on():
     return (read_conf().get('pixel') or 'off').strip().lower() in ('on', 'yes', 'true', '1')
@@ -964,7 +991,8 @@ def make_frost(img, pal):
     """Blurred, saturated copy of the wallpaper for glass cards, with its brightness pushed
     toward the palette base wherever it would hurt text contrast (light flavour: lift dark
     areas; dark flavours: dim bright areas). Pixel-aligned with the wallpaper."""
-    small = np.asarray(img.resize((W // 4, H // 4), Image.BOX)).astype(np.float32) / 255
+    iw, ih = img.size
+    small = np.asarray(img.resize((iw // 4, ih // 4), Image.BOX)).astype(np.float32) / 255
     small = cv2.GaussianBlur(small, (0, 0), 7)
     luma = small @ np.array([0.299, 0.587, 0.114], np.float32)
     small = np.clip(luma[..., None] + (small - luma[..., None]) * 1.35, 0, 1)      # vibrancy
@@ -978,7 +1006,7 @@ def make_frost(img, pal):
         m = np.clip((luma - lim) / np.maximum(luma - lb, 1e-3), 0, 1)
     m = np.maximum(m, 0.30)[..., None]                                             # base frosting
     small = small * (1 - m) + base * m
-    big = cv2.resize(small, (W, H), interpolation=cv2.INTER_CUBIC)
+    big = cv2.resize(small, (iw, ih), interpolation=cv2.INTER_CUBIC)
     big += np.random.default_rng(2).normal(0, 1.2 / 255, big.shape).astype(np.float32)  # grain
     return Image.fromarray((np.clip(big, 0, 1) * 255 + 0.5).astype(np.uint8), 'RGB')
 
@@ -1019,7 +1047,7 @@ def write_slot(t_slot, interval, lat, lon, name, out_dir):
     e['wx'] = load_wx()
     e['season'], e['season_w'], e['snow'] = season_info(read_conf().get('season'), mid, lat, e['wx'])
     e['scene'] = scene
-    img = render(e)
+    img = fit_screen(render(e), scene, screen_size(), e.get('pixel'))
     img.save(png + '.tmp.png', optimize=False, compress_level=3)
     os.replace(png + '.tmp.png', png)
     save_frost(img, palette(e), frost)
@@ -1037,7 +1065,7 @@ def write_palette(e, key, png, frost, name, lua):
 def prune(out_dir, keep=48):
     # every slot render (any suffixes: -camp, -winter, -px, ...), not its -frost.png companion
     pngs = sorted((f for f in os.listdir(out_dir)
-                   if re.match(r'^\d{12}(-[a-z]+)*\.png$', f) and not f.endswith('-frost.png')),
+                   if re.match(r'^\d{12}(-[a-z0-9]+)*\.png$', f) and not f.endswith('-frost.png')),
                   key=lambda f: os.path.getmtime(os.path.join(out_dir, f)))
     for f in pngs[:-keep]:
         for ext in ('.png', '.lua', '-frost.png'):
@@ -1053,6 +1081,7 @@ def main():
     ap.add_argument('--info', action='store_true')
     ap.add_argument('--wx', help='with --at: "kind:cover", e.g. rain:90, clear:0 (testing)')
     ap.add_argument('--pixel', action='store_true', help='with --at: pixel-art look')
+    ap.add_argument('--size', help='with --at: fit to a screen of this size, e.g. 3440x1440 (default: 1920x1200)')
     ap.add_argument('--season', help='with --at: spring | summer | autumn | winter (default: by date)')
     ap.add_argument('--scene', help='with --at: render this scene (%s) instead of the configured one' % ', '.join(scenes.SCENES))
     a = ap.parse_args()
@@ -1076,7 +1105,11 @@ def main():
         e['season'], e['season_w'], e['snow'] = season_info(a.season or read_conf().get('season'), t, lat, e.get('wx'))
         e['pixel'] = a.pixel or pixel_on()
         out = a.out or os.path.join(CACHE, 'at-%s.png' % t.strftime('%Y%m%d%H%M'))
-        render(e).save(out)
+        img = render(e)
+        if a.size:
+            sw, sh = (int(v) for v in a.size.lower().split('x'))
+            img = fit_screen(img, e['scene'], (sw, sh), e['pixel'])
+        img.save(out)
         print(out, json.dumps({k: (round(v, 2) if isinstance(v, float) else v) for k, v in e.items() if k != 'limb'}))
         return
     os.makedirs(CACHE, exist_ok=True)
