@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Supervisor for one living-sky conky: makes its window click-through and restarts it if it crashes.
+# Started by `living-sky start`; stopped by `living-sky stop` (TERM -> also stops conky).
+CONF="$1"
+[ -f "$CONF" ] || { echo "usage: $0 <conky.conf>"; exit 1; }
+DIR="$(dirname "$(readlink -f "$0")")"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/living-sky"
+LOG="$CACHE/run.log"
+echo $$ > "$CACHE/run.pid"
+
+# conky binary: $CONKY_BIN, else the newest AppImage in ~/.local/opt/conky, else conky from PATH
+if [ -z "${CONKY_BIN:-}" ]; then
+    CONKY_BIN=$(ls -1 "$HOME"/.local/opt/conky/conky-*.AppImage 2>/dev/null | sort -V | tail -1)
+    [ -x "$CONKY_BIN" ] || CONKY_BIN=conky
+fi
+# window title set in the theme's conky.conf (own_window_title)
+TITLE=$(sed -n "s/.*own_window_title *= *'\([^']*\)'.*/\1/p" "$CONF" | head -1)
+TITLE=${TITLE:-living-sky}
+
+# conky before 1.19 crashes with these themes (seen: 1.12.2 segfaults); say so where it will be read
+ver=$("$CONKY_BIN" -v 2>/dev/null | head -1 | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -1)
+case "$ver" in 1.1[0-8].*|1.[0-9].*)
+    echo "$(date '+%F %T') conky $ver is too old (1.19+ needed): put the conky AppImage in ~/.local/opt/conky/" >> "$LOG" ;;
+esac
+
+trap 'kill $cpid 2>/dev/null; rm -f "$CACHE/run.pid"; exit 0' TERM INT
+fails=0
+while true; do
+    start=$(date +%s)
+    "$CONKY_BIN" -c "$CONF" > "$CACHE/conky.log" 2>&1 &
+    cpid=$!
+    # the full-screen canvas must not eat clicks: empty input shape once the window exists
+    for _ in $(seq 20); do
+        sleep 0.5
+        python3 "$DIR/clickthrough.py" "$TITLE" >/dev/null 2>&1 && break
+    done
+    wait $cpid
+    code=$?
+    echo "$(date '+%F %T') $(basename "$CONKY_BIN") exited ($code) for $CONF" >> "$LOG"
+    grep -iv 'deprecated\|removed' "$CACHE/conky.log" 2>/dev/null | tail -3 | sed 's/^/    conky: /' >> "$LOG"
+    if [ $(( $(date +%s) - start )) -lt 10 ]; then fails=$((fails + 1)); else fails=0; fi
+    [ $fails -ge 5 ] && { echo "$(date '+%F %T') giving up" >> "$LOG"; rm -f "$CACHE/run.pid"; exit 1; }
+    sleep 2
+done

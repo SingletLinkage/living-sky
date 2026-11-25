@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.tmp
+*.tmp.png
+gnome-extension/build/
+.pytest_cache/

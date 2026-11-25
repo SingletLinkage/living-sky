@@ -1,0 +1,7 @@
+{
+  "uuid": "glob@living-sky",
+  "name": "Glob",
+  "description": "Your living-sky glob pet (Mimi by default) in the top panel: mirrors its mood, weather gear and actions. Reads ~/.cache/living-sky/glob.json written by the living-sky conky desktop. Click to poke, double-click for a heart.",
+  "shell-version": ["45", "46", "47", "48"],
+  "version": 1
+}

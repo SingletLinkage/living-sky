@@ -1,0 +1,4 @@
+# Checked in CI (.github/workflows/ci.yml): real errors only (undefined names, unused imports, syntax).
+line-length = 120
+[lint]
+select = ["F", "E9"]

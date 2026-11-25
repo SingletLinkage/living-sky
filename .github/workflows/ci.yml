@@ -1,0 +1,23 @@
+name: checks
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    # Ubuntu 22.04 = GNOME 42, the oldest desktop living-sky supports
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-opencv python3-pil python3-gi \
+            python3-pytest gir1.2-gtk-4.0 gir1.2-adw-1 gjs lua5.4 shellcheck
+          pip install --user ruff
+      - name: Lint Python (ruff)
+        run: ~/.local/bin/ruff check .
+      - name: Lint shell (shellcheck, errors)
+        run: shellcheck -S error install.sh uninstall.sh bin/living-sky bin/living-sky-run tools/*.sh
+      - name: Tests (pytest)
+        run: python3 -m pytest -q tests

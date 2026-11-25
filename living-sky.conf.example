@@ -1,0 +1,102 @@
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ living-sky settings: everything you can change, on one page.                 │
+# │ Your copy lives at ~/.config/living-sky/living-sky.conf (./install.sh makes  │
+# │ it). Changes apply by themselves within a few seconds (no restart needed);   │
+# │ or use the settings window: living-sky settings                              │
+# │ Format: key = value. Lines starting with # are comments.                     │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
+# ── Look ──────────────────────────────────────────────────────────────────────────
+
+# Card style: glass (frosted liquid-glass panes) | cards (solid cards)
+theme = glass
+
+# Accent colours. Primary: the clock, your glob pet, highlights.
+# Secondary: the weekday and other second accents.
+#   auto      follow the time of day (accents change with the sky)
+#   lavender  lavender + peach      sakura  cherry-blossom pink + butter
+#   mint      mint + lilac          peach   peach + rose
+#   ocean     sky blue + sea-glass teal
+#   #rrggbb, #rrggbb   your own primary and secondary
+# Every choice is nudged very slightly with the sun (calmer at night, warmer at golden hour,
+# deeper on the light daytime cards) so it keeps its character. Preview: art/demos/colors.jpg
+colors = auto
+
+# Scene in front of the sky (previews: art/demos/scene-*.jpg):
+#   lake    mountains over a lake with reflections (the original)
+#   forest  rolling pine hills, valley mist at dawn and dusk, a cabin whose window glows after dark
+#   city    a skyline whose windows light up in the evening and go dark through the night
+#   camp    a tent in a forest clearing; the campfire burns from dusk to dawn and lights it warmly
+scene = lake
+
+# Pixel-art look for the wallpaper (any scene): on | off
+pixel = off
+
+# Seasons (previews: art/demos/seasons.jpg): auto | spring | summer | autumn | winter
+#   auto blends them smoothly through the year for your hemisphere (always summer near the equator):
+#   the light and colours shift a little (fresher spring, warmer summer, amber autumn, crisp winter),
+#   the forest's larches turn gold in autumn. Snow lies when it is really snowing, when you set
+#   winter here, or in auto winters at high latitudes (above 45°).
+season = auto
+
+# Units for temperature and wind: metric (°C, km/h) | imperial (°F, mph)
+units = metric
+
+# Clock (and sunrise / sunset) format: 24h | 12h. Weekday and month names follow your system language.
+clock = 24h
+
+# ── Cards ─────────────────────────────────────────────────────────────────────────
+# Show (on) or hide (off) each card. Hidden cards aren't loaded at all, so they cost nothing.
+# Cards that don't apply to your machine hide themselves (e.g. gpu without an NVIDIA GPU).
+# Order: optional `cards = network, clock, cpu` puts those first; the rest follow in the default order
+# (clock, weather, calendar, media, cpu, memory, disks, gpu, battery, network). The pet sits on the first card.
+
+# time, weekday, date, uptime; battery and OS / kernel
+card_clock = on
+# temperature, conditions, AQI, UV, humidity, rain, clouds, wind, sunrise / sunset, moon
+card_weather = on
+# usage, per-thread bars, temperature, clock speed, fans, load
+card_cpu = on
+# RAM, swap, root disk, disk I/O
+card_memory = on
+# NVIDIA GPU usage, temperature, power, VRAM (never wakes a sleeping GPU)
+card_gpu = on
+# Wi-Fi / interface, IP address, download / upload
+card_network = on
+# ── more cards, off by default (the column above already fills a 1200 px screen; extra cards
+#    continue in a second column to the left)
+# this month as a grid, today highlighted; week_start = monday | sunday
+card_calendar = off
+week_start = monday
+# now playing (any media player): title, artist, progress
+card_media = off
+# every mounted disk with a usage bar
+card_disks = off
+# battery charge, health vs. design capacity, cycles, power draw, time left
+card_battery = off
+
+# ── Glob pet ──────────────────────────────────────────────────────────────────────
+# Your desktop pet (preview: art/glob/lineup.png), or off:
+#   mimi   cheerful, social lavender blob; wears your primary colour if you pick a colour set (asleep 00-06)
+#   pip    hyper sapphire droplet: hops a lot, splashes in the rain, startles easily (asleep 00-06:30)
+#   bun    sleepy slice of bread: naps, snacks twice as often, grumpy when woken (asleep 22:30-08:30)
+#   nyx    a little moon showing tonight's real phase: awake at night, glows, stargazes (asleep by day)
+#   cubo   studious teal cube with glasses: reads, coffee all day, sneezes at dust (asleep 01-07)
+#   ember  a campfire wisp: flickers with your CPU, a blue pilot light when cold or asleep (asleep 01-07)
+#   random a pet of the day (a different one each day)
+#   scene  the pet that goes with the scene (lake: pip, forest: bun, city: cubo, camp: ember)
+glob = mimi
+
+# ── Sky & location ────────────────────────────────────────────────────────────────
+
+# Location for the sun, moon and weather, in decimal degrees. Leave empty to look it up.
+lat =
+lon =
+# Place name shown on the weather card when you set lat / lon yourself.
+name =
+# geo = auto: find the location once from your IP address (ipinfo.io / ipapi.co), then cache it.
+# geo = off:  never look it up (set lat / lon above).
+geo = auto
+
+# Minutes between wallpaper renders (one render per slot; at least 5).
+interval_min = 60

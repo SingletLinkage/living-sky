@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# living-sky: start / stop / switch the living-sky conky desktop.
+#
+#   living-sky start [glass|cards]   start (default: `theme` from living-sky.conf, else glass)
+#   living-sky stop                  stop it and put your previous wallpaper back
+#   living-sky restart [theme]
+#   living-sky status
+#   living-sky settings              open the settings window
+#   living-sky set <key> <value>     change a setting (and apply it); set --list: every setting
+#   living-sky get <key>             print a setting
+#   living-sky config                open living-sky.conf in your editor
+#   living-sky logs [-f]             recent errors and log lines (-f: follow them)
+#   living-sky preview [theme] [--demo]   write a one-off PNG of the cards + pet
+#                                    (--demo: placeholders for Wi-Fi name, IP, place, host)
+#   living-sky doctor                what was detected, settings, recent errors (for bug reports)
+#   living-sky themes                list themes
+#
+# Code root = the folder this script lives in (../), so it runs from anywhere.
+# Config: ~/.config/living-sky/living-sky.conf   Cache: ~/.cache/living-sky
+set -u
+ROOT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/living-sky"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/living-sky"
+CONF="$CONF_DIR/living-sky.conf"
+[ -f "$CONF" ] || CONF="$ROOT/living-sky.conf.example"
+FALLBACK="$ROOT/art/lake/wallpaper-static.png"
+mkdir -p "$CACHE"
+
+conf_get() {   # conf_get key default
+    local v
+    v=$(sed -n "s/^[[:space:]]*$1[[:space:]]*=[[:space:]]*\([^#]*\).*/\1/p" "$CONF" 2>/dev/null | tail -1 | xargs)
+    echo "${v:-$2}"
+}
+themes() { for d in "$ROOT"/themes/*/; do [ -f "$d/conky.conf" ] && basename "$d"; done; }
+gnome_bg() { command -v gsettings >/dev/null && gsettings "$@" org.gnome.desktop.background 2>/dev/null; }
+
+set_wall() {
+    command -v gsettings >/dev/null || return 0
+    gsettings set org.gnome.desktop.background picture-uri "file://$1"
+    gsettings set org.gnome.desktop.background picture-uri-dark "file://$1"
+    gsettings set org.gnome.desktop.background picture-options 'zoom'
+}
+
+save_wall() {    # remember the user's own wallpaper once, so `stop` can restore it
+    [ -f "$CACHE/prev_wallpaper" ] && return
+    local uri dark opts
+    uri=$(gsettings get org.gnome.desktop.background picture-uri 2>/dev/null) || return 0
+    case "$uri" in *living-sky*|*conky-sky*) return ;; esac
+    dark=$(gsettings get org.gnome.desktop.background picture-uri-dark 2>/dev/null)
+    opts=$(gsettings get org.gnome.desktop.background picture-options 2>/dev/null)
+    printf '%s\n%s\n%s\n' "$uri" "$dark" "$opts" > "$CACHE/prev_wallpaper"
+}
+
+restore_wall() {
+    [ -f "$CACHE/prev_wallpaper" ] || return 0
+    { read -r uri; read -r dark; read -r opts; } < "$CACHE/prev_wallpaper"
+    gsettings set org.gnome.desktop.background picture-uri "$uri"
+    [ -n "$dark" ] && gsettings set org.gnome.desktop.background picture-uri-dark "$dark"
+    [ -n "$opts" ] && gsettings set org.gnome.desktop.background picture-options "$opts"
+    rm -f "$CACHE/prev_wallpaper"
+}
+
+running_pid() {
+    local pid
+    pid=$(cat "$CACHE/run.pid" 2>/dev/null) || return 1
+    [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && grep -q living-sky-run "/proc/$pid/cmdline" 2>/dev/null && echo "$pid"
+}
+
+stop_conky() {
+    local pid
+    if pid=$(running_pid); then
+        kill "$pid" 2>/dev/null                       # the runner kills its conky on TERM
+        for _ in $(seq 20); do kill -0 "$pid" 2>/dev/null || break; sleep 0.1; done
+    fi
+    rm -f "$CACHE/run.pid"
+    local t esc                                       # stray conky from a crashed runner: exactly our configs
+    for t in $(themes); do
+        esc=$(printf '%s' "$CACHE/$t.conky.conf" | sed 's/[]\\[*^$+?(){}|.]/\\&/g')
+        pkill -f -- "-c $esc\$" 2>/dev/null
+    done
+    local hp                                          # this home's presence helper, by its pid file
+    hp=$(cat "$CACHE/presence.pid" 2>/dev/null)
+    [ -n "$hp" ] && grep -q glob-presence "/proc/$hp/cmdline" 2>/dev/null && kill "$hp" 2>/dev/null
+}
+
+start() {
+    local theme="${1:-$(conf_get theme glass)}"
+    [ -f "$ROOT/themes/$theme/conky.conf" ] || { echo "unknown theme '$theme' (have: $(themes | xargs))" >&2; exit 1; }
+    stop_conky
+    save_wall
+    # show the last render (or the static art) right away; the theme switches to live renders itself
+    local last
+    last="$CACHE/$(cat "$CACHE/current" 2>/dev/null).png"
+    [ -f "$last" ] && set_wall "$last" || set_wall "$FALLBACK"
+    # the canvas covers the primary monitor (W x H at +X+Y); fallback: the whole X screen
+    local geo w h x y
+    geo=$(xrandr --query 2>/dev/null | sed -n 's/.* connected primary \([0-9]*\)x\([0-9]*\)+\([0-9]*\)+\([0-9]*\).*/\1 \2 \3 \4/p' | head -1)
+    [ -n "$geo" ] || geo=$(xrandr --current 2>/dev/null | sed -n 's/.*current \([0-9]*\) x \([0-9]*\),.*/\1 \2 0 0/p' | head -1)
+    read -r w h x y <<< "${geo:-1920 1200 0 0}"
+    # conky config with the real code path and screen geometry filled in
+    local cc="$CACHE/$theme.conky.conf"
+    local root_esc
+    root_esc=$(printf '%s' "$ROOT" | sed 's/[|&\\]/\\&/g')    # a path with | & or \ can't break the sed below
+    sed -e "s|@ROOT@|$root_esc|g" -e "s|@W@|$w|g" -e "s|@H@|$h|g" -e "s|@X@|$x|g" -e "s|@Y@|$y|g" \
+        "$ROOT/themes/$theme/conky.conf" > "$cc"
+    echo "$theme" > "$CACHE/theme"
+    # render the current slot if missing (and its frost image), in the background
+    (nice -n 10 python3 "$ROOT/core/sky.py" --now >> "$CACHE/render.log" 2>&1 &)
+    LIVING_SKY_W=$w LIVING_SKY_H=$h setsid -f "$ROOT/bin/living-sky-run" "$cc" > /dev/null 2>&1 < /dev/null
+    echo "living-sky: started ($theme)"
+}
+
+case "${1:-}" in
+    start)   start "${2:-}" ;;
+    stop)    stop_conky; restore_wall; echo "living-sky: stopped" ;;
+    restart) start "${2:-$(cat "$CACHE/theme" 2>/dev/null)}" ;;
+    status)
+        if pid=$(running_pid); then echo "running: $(cat "$CACHE/theme" 2>/dev/null) (runner pid $pid)"
+        else echo "not running"; fi
+        echo "config: $CONF"; echo "cache:  $CACHE ($(du -sh "$CACHE" 2>/dev/null | cut -f1))" ;;
+    preview)
+        shift; demo=""; theme=""
+        for a in "$@"; do case "$a" in --demo) demo=demo ;; *) theme="$a" ;; esac; done
+        theme="${theme:-$(cat "$CACHE/theme" 2>/dev/null || echo glass)}"
+        running_pid > /dev/null || { echo "start it first: living-sky start $theme" >&2; exit 1; }
+        rm -f "$CACHE/preview-$theme.png"; echo "$demo" > "$CACHE/preview-$theme"
+        for _ in $(seq 40); do [ -f "$CACHE/preview-$theme.png" ] && break; sleep 0.25; done
+        [ -f "$CACHE/preview-$theme.png" ] && echo "$CACHE/preview-$theme.png" || { echo "no preview (is '$theme' the running theme?)" >&2; exit 1; } ;;
+    doctor)
+        h() { printf '\n\033[1m%s\033[0m\n' "$1"; }
+        h "living-sky"
+        echo "code:    $ROOT ($(git -C "$ROOT" describe --always --dirty 2>/dev/null || echo 'no git'))"
+        echo "config:  $CONF"
+        echo "cache:   $CACHE ($(du -sh "$CACHE" 2>/dev/null | cut -f1))"
+        if pid=$(running_pid); then echo "running: $(cat "$CACHE/theme" 2>/dev/null) (runner pid $pid)"; else echo "running: no"; fi
+        h "settings that differ from the defaults"
+        diff <(grep -E '^[a-z_]+ *=' "$ROOT/living-sky.conf.example" | sed 's/ *= */ = /' | sort) \
+             <(grep -E '^[a-z_]+ *=' "$CONF" | sed 's/ *= */ = /' | sort) | sed -n 's/^> /  /p'
+        h "session"
+        echo "  ${XDG_SESSION_TYPE:-?} · ${XDG_CURRENT_DESKTOP:-?} · $(gnome-shell --version 2>/dev/null)"
+        cb="${CONKY_BIN:-$(ls -1 "$HOME"/.local/opt/conky/conky-*.AppImage 2>/dev/null | sort -V | tail -1)}"
+        [ -x "$cb" ] || cb=$(command -v conky)
+        echo "  conky: ${cb:-not found} $("${cb:-false}" -v 2>/dev/null | head -1 | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')"
+        h "detected (by the running desktop)"
+        if [ -f "$CACHE/detected" ]; then sed 's/^/  /' "$CACHE/detected"; else echo "  (nothing yet: start it first)"; fi
+        h "presence helper"
+        ppid=$(cat "$CACHE/presence.pid" 2>/dev/null)
+        if [ -n "$ppid" ] && grep -q glob-presence "/proc/$ppid/cmdline" 2>/dev/null; then
+            echo "  running (pid $ppid) · $(tr '\n' ' ' < "$CACHE/presence" 2>/dev/null)"
+        else echo "  not running"; fi
+        for log in cards.err glob.err render.log weather.log run.log; do
+            h "$log"
+            if [ -s "$CACHE/$log" ]; then tail -5 "$CACHE/$log" | sed 's/^/  /'; else echo "  (empty)"; fi
+        done ;;
+    themes)  themes ;;
+    settings) exec python3 "$ROOT/app/living_sky_settings.py" ;;
+    get)  [ $# -eq 2 ] || { echo "usage: living-sky get <key>" >&2; exit 1; }
+          python3 "$ROOT/core/conf.py" get "$2" ;;
+    set)
+        if [ "${2:-}" = --list ] || [ $# -lt 3 ]; then python3 "$ROOT/core/conf.py" keys; [ $# -ge 3 ] || [ "${2:-}" = --list ]; exit; fi
+        key=$2; shift 2
+        python3 "$ROOT/core/conf.py" set "$key" "$*" || exit 1
+        if running_pid > /dev/null; then echo "$key = $*  (applies within a few seconds)"
+        else echo "$key = $*  (living-sky isn't running: living-sky start)"; fi ;;
+    config)
+        CONF_USER="$CONF_DIR/living-sky.conf"
+        [ -f "$CONF_USER" ] || { mkdir -p "$CONF_DIR"; cp "$ROOT/living-sky.conf.example" "$CONF_USER"; }
+        ed="${VISUAL:-${EDITOR:-}}"
+        if [ -n "$ed" ]; then exec $ed "$CONF_USER"; else exec xdg-open "$CONF_USER"; fi ;;
+    logs)
+        if [ "${2:-}" = -f ]; then
+            cd "$CACHE" && exec tail -n 5 -F cards.err glob.err render.log weather.log run.log 2>/dev/null
+        fi
+        for log in cards.err glob.err render.log weather.log run.log conky.log; do
+            [ -s "$CACHE/$log" ] || continue
+            printf '\n\033[1m%s\033[0m\n' "$log"; tail -n 15 "$CACHE/$log"
+        done ;;
+    *) sed -n '3,17p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac
