@@ -226,15 +226,31 @@ def city(img, e, S):
 FIRE = (1182.0, 1005.0)                 # the base of the flames: on the logs in the stone ring
 
 
-def _flame(x, yb, w, h, lean):
-    """A flame tongue: base (x, yb), tip h above, leaning by `lean` px."""
-    return [(x - w, yb), (x - w * 0.9, yb - h * 0.35), (x - w * 0.35 + lean * 0.5, yb - h * 0.7), (x + lean, yb - h),
-            (x + w * 0.4 + lean * 0.4, yb - h * 0.62), (x + w * 0.95, yb - h * 0.3), (x + w, yb)]
+def _tongue(x0, yb, w, h, lean, phase=0.0):
+    """A flame tongue: a rounded belly tapering in an S-curve to a point, a rounded base among the logs."""
+    right, left = [], []
+    n = 16
+    for i in range(n + 1):
+        t = i / n                                       # 0 = base, 1 = tip
+        belly = np.sin(np.pi * (0.28 + 0.72 * (1.0 - t))) ** 0.75
+        sway = lean * t ** 1.35 + w * 0.24 * np.sin(t * np.pi * 2.1 + phase) * np.sin(np.pi * t)
+        half, y = w * belly * (1.0 - t) ** 0.95, yb - h * t
+        if i == n:
+            right.append((x0 + sway, y))
+        else:
+            right.append((x0 + sway + half, y))
+            left.append((x0 + sway - half, y))
+    bottom = [(x0 + w * 0.65 * np.cos(a), yb + 5.0 * np.sin(a)) for a in np.linspace(0, np.pi, 7)[1:-1]]
+    return right + list(reversed(left)) + bottom
 
 
-def _poly_blob(cx, cy, rx, ry, n=16):
-    return [(cx + rx * np.cos(2 * np.pi * k / n), cy + ry * np.sin(2 * np.pi * k / n)) for k in range(n)]
-
+def _pot_mask(S):
+    """The hanging pot's bowl in the painting (cached): the flames go behind it."""
+    if 'pot' not in _cache:
+        pts = [(1182.0 + 30.0 * np.cos(a), 926.0 + 30.0 * np.sin(a)) for a in np.linspace(0, np.pi, 20)]
+        pts += [(1150, 912), (1214, 912)]
+        _cache['pot'] = cv2.GaussianBlur(_poly_mask(S, [pts]), (0, 0), 0.8)
+    return _cache['pot']
 
 def camp(img, e, S):
     alt = e['sun_alt']
@@ -272,22 +288,48 @@ def camp(img, e, S):
     img = img * (1 - alpha[..., None]) + col * alpha[..., None]
 
     flick = np.random.default_rng(int(e.get('day_seed', 1)) * 24 + int(e.get('hour', 0)))   # this hour's flames
+    # the coal bed glows among the logs (faintly by day too) and lights the pot's underside
+    coal = np.exp(-(((S.XX - FX) / 42.0) ** 2 + ((S.YY - (FY + 3.0)) / 10.5) ** 2))
+    img = S.screen(img, S.C(255, 105, 34), coal * (0.72 * fire + 0.35 * (1 - fire)))
     if fire > 0:
         g1 = np.exp(-(((S.XX - FX) / 220) ** 2 + ((S.YY - FY) / 85) ** 2))
         g2 = np.exp(-(((S.XX - FX) / 560) ** 2 + ((S.YY - FY + 30) / 260) ** 2)) * 0.16
         img = S.screen(img, S.C(255, 138, 52), np.clip((g1 * 0.62 + g2) * fire, 0, 1))
-        flames = [_flame(FX + (k - 2) * 16 + flick.uniform(-4, 4), FY, 16 - abs(k - 2) * 2.2,
-                         (68 - abs(k - 2) * 13) * flick.uniform(0.85, 1.15), flick.uniform(-9, 9)) for k in range(5)]
-        for colr, sc in ((S.C(235, 86, 36), 1.0), (S.C(255, 168, 56), 0.70), (S.C(255, 240, 185), 0.38)):
-            polys = [[(FX + (px - FX) * sc, FY - (FY - py) * sc) for px, py in f] for f in flames]
-            img = S.over(img, colr, _poly_mask(S, polys) * fire)
-        emb = np.zeros((S.H, S.W), np.float32)           # embers rising
-        for _ in range(28):
-            cv2.circle(emb, (int(FX + flick.uniform(-65, 65)), int(FY - flick.uniform(40, 270))),
-                       int(flick.integers(1, 3)), float(flick.uniform(0.6, 1.0)), -1, cv2.LINE_AA)
-        img = S.screen(img, S.C(255, 206, 118), np.clip(cv2.GaussianBlur(emb, (0, 0), 3.0) * 1.8 + emb, 0, 1) * fire)
-    else:                                                # by day: embers
-        img = S.over(img, S.C(175, 75, 32), _poly_mask(S, [_poly_blob(FX, FY - 2, 34, 8)]) * 0.45)
+        pot = _pot_mask(S)
+        rim = pot * np.exp(-(((S.XX - FX) / 28.0) ** 2 + ((S.YY - 954.0) / 14.0) ** 2))
+        img = S.screen(img, S.C(255, 146, 58), rim * 0.55 * fire)
+        # flames: smooth tapered tongues fused at the base into one fire, behind the pot
+        behind_pot = 1.0 - pot * 0.88
+        bridge = np.exp(-(((S.XX - FX) / 28.0) ** 2 + ((S.YY - (FY - 4)) / 10.0) ** 2))
+        ph = flick.uniform(0, 2 * np.pi)                     # this hour's shapes
+
+        def fused(specs, sigma, extra, clip=None):
+            raw = np.maximum(_poly_mask(S, [_tongue(*sp) for sp in specs]), bridge * extra)
+            m = np.clip((cv2.GaussianBlur(raw, (0, 0), sigma) - 0.28) / 0.36, 0, 1)
+            return m * (clip if clip is not None else behind_pot)
+        outer = fused([(FX - 27, FY + 3, 10.5, 40 * flick.uniform(0.85, 1.12), -8 + flick.uniform(-3, 3), ph + 0.2),
+                       (FX - 14, FY + 1, 13.5, 56 * flick.uniform(0.85, 1.12), -4 + flick.uniform(-3, 3), ph + 1.4),
+                       (FX, FY, 15.5, 65 * flick.uniform(0.88, 1.12), 2 + flick.uniform(-4, 4), ph + 2.5),
+                       (FX + 15, FY + 1, 13.0, 54 * flick.uniform(0.85, 1.12), 6 + flick.uniform(-3, 3), ph + 3.8),
+                       (FX + 28, FY + 4, 10.0, 37 * flick.uniform(0.85, 1.12), 9 + flick.uniform(-3, 3), ph + 5.0)],
+                      1.7, 1.0)
+        mid = fused([(FX - 11, FY + 2, 10.5, 39, -3, ph + 1.1), (FX + 1, FY + 1, 12.5, 48, 2, ph + 2.3),
+                     (FX + 13, FY + 3, 9.5, 36, 4, ph + 3.6)], 1.3, 0.9, outer)
+        core = cv2.GaussianBlur(_poly_mask(S, [_tongue(FX - 4, FY + 3, 8.5, 25, -2, ph + 0.7),
+                                               _tongue(FX + 6, FY + 3, 8.0, 22, 2, ph + 2.1)]), (0, 0), 1.2) * outer
+        img = S.screen(img, S.C(255, 118, 36), cv2.GaussianBlur(outer, (0, 0), 9.0) * 0.58 * fire)   # bloom
+        img = S.over(img, S.C(234, 84, 32), outer * 0.93 * fire)
+        img = S.over(img, S.C(255, 174, 54), mid * 0.96 * fire)
+        img = S.over(img, S.C(255, 242, 194), np.clip(core * 1.15, 0, 1) * fire)
+        # sparks: soft round motes rising with the smoke
+        emb = np.zeros((S.H, S.W), np.float32)
+        for _ in range(18):
+            t = flick.uniform(0.04, 0.72)
+            x = FX + 26.0 * t + 8.0 * np.sin(t * 5.0 + 0.5) * t + flick.normal(0, 12.0 + 18.0 * t)
+            cv2.circle(emb, (int(round(x)), int(round(960.0 - 250.0 * t))), 1,
+                       float(flick.uniform(0.65, 1.0) * (1.0 - 0.55 * t)), -1, cv2.LINE_AA)
+        sparks = cv2.GaussianBlur(emb, (0, 0), 1.25) * 2.2 + cv2.GaussianBlur(emb, (0, 0), 4.0) * 1.4
+        img = S.screen(img, S.C(255, 206, 118), np.clip(sparks, 0, 1) * fire)
     img = _smoke(S, img, hor, FX, 835, 350, 28, 15, 7, 29, 0.18 + 0.22 * fire, 7)
     if dark > 0.3 and w.get('summer', 0) > 0.3 and snow < 0.2:     # fireflies on summer nights
         ff = np.zeros((S.H, S.W), np.float32)
