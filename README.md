@@ -15,10 +15,6 @@ time, the weather, the air, your music and your typing.
 
 ![Meet the globs: Mimi, Pip, Bun, Nyx, Cubo and Ember](art/glob/lineup.png)
 
-| Mimi | Pip | Bun | Nyx | Cubo | Ember |
-|---|---|---|---|---|---|
-| ![Mimi](art/glob/mimi/mimi.gif) | ![Pip](art/glob/pip/pip.gif) | ![Bun](art/glob/bun/bun.gif) | ![Nyx](art/glob/nyx/nyx.gif) | ![Cubo](art/glob/cubo/cubo.gif) | ![Ember](art/glob/ember/ember.gif) |
-
 ## Highlights
 - **A living wallpaper:** four painted scenes (lake, forest, city, camp) relit through the day for the real sun,
   moon, season and weather; city windows light up in the evening, the campfire burns from dusk to dawn.
