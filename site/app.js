@@ -80,6 +80,7 @@ safe('copy', () => {
   const status = $('#copy-status');
   document.querySelectorAll('main pre').forEach(pre => {
     pre.tabIndex = 0; pre.setAttribute('role', 'region'); pre.setAttribute('aria-label', 'Commands (scrollable)');
+    if (pre.hasAttribute('data-no-copy')) return;      // reference / either-or blocks: copying them would run them all
     const box = document.createElement('div'); box.className = 'codebox';
     pre.replaceWith(box);
     const bar = document.createElement('div'); bar.className = 'codebox-bar'; box.append(bar, pre);
@@ -118,26 +119,31 @@ safe('hero', () => {
   const btn = document.createElement('button');
   btn.type = 'button'; btn.className = 'btn small';
   fig.appendChild(btn);
-  let loaded = false;
-  const show = playing => {
-    const v = playing ? gif : poster;
-    img.src = v.src; img.alt = v.alt; cap.textContent = v.cap;
-    btn.textContent = playing ? 'Pause animation' : 'Play animation';
-    btn.setAttribute('aria-pressed', String(playing));
+  // states: 'still' (poster), 'loading' (fetching the animation; poster still shown), 'playing'
+  let state = 'still', loaded = false;
+  const set = s => {
+    state = s;
+    const playing = s === 'playing', v = playing ? gif : poster;
+    img.src = v.src; img.alt = v.alt;
+    cap.textContent = s === 'loading' ? 'Loading the day animation (3.5 MB)…' : v.cap;
+    btn.textContent = playing ? 'Pause animation' : s === 'loading' ? 'Loading…' : 'Play animation';
+    btn.setAttribute('aria-pressed', String(s !== 'still'));
+    btn.toggleAttribute('aria-busy', s === 'loading');
   };
   const play = () => {
-    if (loaded) return show(true);
+    if (loaded) return set('playing');
+    set('loading');
     const pre = new Image();
-    pre.onload = () => { loaded = true; if (btn.getAttribute('aria-pressed') === 'true') show(true); };
+    pre.onload = () => { loaded = true; if (state === 'loading') set('playing'); };
+    pre.onerror = () => { if (state === 'loading') { set('still'); cap.textContent = 'The animation could not be loaded.'; } };
     pre.src = gif.src;
   };
-  btn.addEventListener('click', () => {
-    if (btn.getAttribute('aria-pressed') === 'true') show(false);
-    else { btn.setAttribute('aria-pressed', 'true'); btn.textContent = 'Pause animation'; play(); }
-  });
-  show(false);
-  if (!calm) {
-    const start = () => { btn.setAttribute('aria-pressed', 'true'); btn.textContent = 'Pause animation'; play(); };
+  btn.addEventListener('click', () => { if (state === 'still') play(); else set('still'); });
+  set('still');
+  // plays by itself after the page has loaded, unless the visitor asked for less motion or less data
+  const saveData = navigator.connection && navigator.connection.saveData;
+  if (!calm && !saveData) {
+    const start = () => { if (state === 'still') play(); };
     if (document.readyState === 'complete') setTimeout(start, 200); else addEventListener('load', () => setTimeout(start, 200));
   }
 });
@@ -163,7 +169,7 @@ safe('scenes', () => {
   };
   const hours = $('#hours-img'), details = $('#hours-details');
   let scene = 'lake';
-  const applyHours = () => { if (hours.getAttribute('src') !== `art/demos/hours/${scene}.jpg`) hours.src = `art/demos/hours/${scene}.jpg`; hours.alt = `The ${scene} scene for every hour of a day`; };
+  const applyHours = () => swap(hours, `art/demos/hours/${scene}.jpg`, `The ${scene} scene for every hour of a day`);
   details.addEventListener('toggle', () => { if (details.open) applyHours(); });   // only fetch the big sheet when it is open
   const showScene = s => {
     scene = s;
@@ -213,8 +219,8 @@ safe('pets', () => {
       $('#pet-tag').textContent = tag;
       close.setAttribute('aria-label', `Close ${name} details`);
       const sheet = $('#pet-sheet');
-      sheet.src = `art/glob/${id}/showcase.png`;
-      sheet.alt = `${name}'s showcase sheet: every mood, weather and action`;
+      sheet.parentElement.scrollTop = 0;                 // a new pet starts at the top of its sheet
+      swap(sheet, `art/glob/${id}/showcase.png`, `${name}'s showcase sheet: every mood, weather and action`);
       panel.inert = false; panel.classList.add('open');
       $('#pet-name').focus({preventScroll: true});
       if (panel.getBoundingClientRect().top > innerHeight - 200) panel.scrollIntoView({behavior: calm ? 'auto' : 'smooth', block: 'start'});
@@ -223,7 +229,9 @@ safe('pets', () => {
     list.appendChild(b);
   });
   close.addEventListener('click', () => closePanel(true));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && current && panel.contains(document.activeElement)) closePanel(true); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && current && (panel.contains(document.activeElement) || document.activeElement === current)) closePanel(true);
+  });
 });
 
 // Cards

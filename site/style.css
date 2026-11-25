@@ -83,7 +83,8 @@ figure { margin: 0; }
 
 .switch { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px; background: var(--glass);
   border: 1px solid var(--line); border-radius: 999px; margin: 8px 0 16px; }
-.switch.wrap { border-radius: 16px; }
+.switch.wrap, #looks .switch { border-radius: 16px; }
+@media (max-width: 420px) { .switch .sep { display: none; } }
 .switch [role=group] { display: inline-flex; gap: 4px; }
 .switch button { font: 600 14px Inter, system-ui, sans-serif; color: var(--subtext); background: none; border: 0;
   padding: 7px 14px; border-radius: 999px; cursor: pointer; transition: background-color .2s, color .2s; }
@@ -121,6 +122,7 @@ details.more img { margin-bottom: 16px; }
 .pixel-row > div { max-width: 44ch; }
 
 .lineup { margin: 8px 0 0; }
+html.js .lineup { display: none; }               /* the pet cards below show the same six, animated */
 .hint { margin: 12px 0 0; }
 .pets { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 10px; }
 .pet { background: var(--glass); border: 1px solid var(--line); border-radius: 14px; padding: 12px; cursor: pointer;
@@ -131,7 +133,8 @@ details.more img { margin-bottom: 16px; }
 .pet img { border-radius: 10px; margin-bottom: 8px; }
 .pet b { display: block; }
 .pet span { color: var(--overlay); font-size: 13px; line-height: 1.4; display: block; }
-.pet .tag { color: var(--accent2); font-size: 12px; margin-top: 6px; }
+.pet { display: flex; flex-direction: column; }  /* tags line up at the bottom of every card */
+.pet .tag { color: var(--accent2); font-size: 12px; margin-top: auto; padding-top: 8px; }
 .pet-detail { display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; margin-top: 0;
   transition: grid-template-rows .35s ease, opacity .3s ease, margin .35s ease, visibility 0s .35s; }
 .pet-detail.open { grid-template-rows: 1fr; opacity: 1; visibility: visible; margin-top: 20px;
