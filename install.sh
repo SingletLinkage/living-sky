@@ -269,7 +269,7 @@ fi
 if [ $interactive = 1 ] && { [ $fresh = 1 ] || confirm "Go through the setup questions again?" n; }; then
     [ $dry = 1 ] && [ ! -f "$CONF" ] && CONF="$ROOT/living-sky.conf.example"    # dry run: read the defaults
     cur() { sed -n "s/^$1 *= *\(.*\)/\1/p" "$CONF" | head -1; }
-    set_conf theme  "$(choose 'Card style' "$(cur theme)" 'glass cards')"
+    set_conf theme  "$(choose 'Card style' "$(cur theme)" 'glass cards solid')"
     set_conf scene  "$(choose 'Scene' "$(cur scene)" 'lake forest city camp')"
     set_conf pixel  "$(choose 'Pixel-art look' "$(cur pixel)" 'off on')"
     set_conf colors "$(choose 'Colours' "$(cur colors)" 'auto lavender sakura mint peach ocean')"

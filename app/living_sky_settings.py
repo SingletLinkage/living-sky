@@ -32,7 +32,9 @@ SCENES = [('lake', 'Lake', 'Mountains over a lake, with reflections'),
           ('camp', 'Camp', 'A tent in a forest clearing; the campfire burns from dusk to dawn')]
 SEASONS = [('auto', 'Automatic', 'Follows the date for your hemisphere'), ('spring', 'Spring', ''),
            ('summer', 'Summer', ''), ('autumn', 'Autumn', ''), ('winter', 'Winter', 'Snow lies everywhere')]
-THEMES = [('glass', 'Glass', 'Frosted glass panes over the wallpaper'), ('cards', 'Cards', 'Solid Catppuccin cards')]
+THEMES = [('glass', 'Glass', 'Frosted glass panes over the wallpaper'),
+          ('cards', 'Cards', 'Catppuccin cards, the wallpaper faintly showing through'),
+          ('solid', 'Solid', 'Fully opaque Catppuccin cards')]
 COLOR_SETS = [('auto', 'Follow the sky', 'Accents change with the time of day'),
               ('lavender', 'Lavender', 'Lavender + peach'), ('sakura', 'Sakura', 'Cherry-blossom pink + butter'),
               ('mint', 'Mint', 'Mint + lilac'), ('peach', 'Peach', 'Peach + rose'),

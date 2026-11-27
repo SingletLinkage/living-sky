@@ -19,7 +19,7 @@ time, the weather, the air, your music and your typing.
 - **A living wallpaper:** four painted scenes (lake, forest, city, camp) relit through the day for the real sun,
   moon, season and weather; city windows light up in the evening, the campfire burns from dusk to dawn.
   Optional dithered pixel-art look.
-- **Two card styles:** frosted glass or solid Catppuccin cards; clock, weather, CPU, memory, GPU, network, plus
+- **Three card styles:** frosted glass, Catppuccin cards, or the same cards fully solid; clock, weather, CPU, memory, GPU, network, plus
   calendar, now playing, disks and battery. Hardware is detected automatically.
 - **Six glob pets** (or a pet of the day, or the one that matches your scene), on the desktop and in the top panel.
 - **A settings app** ("Living Sky"), or one plain config file; changes apply within seconds.

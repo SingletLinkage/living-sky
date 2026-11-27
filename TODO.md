@@ -16,9 +16,6 @@
 - **Wayland and other desktops:** wallpaper backends beyond gsettings (KDE `plasma-apply-wallpaperimage`,
   XFCE `xfconf-query`, swww / swaybg, feh); conky's `out_to_wayland` / layer-shell where it works; an idle
   fallback in `core/glob-presence.py` when Mutter's IdleMonitor is missing (XScreenSaver / org.freedesktop.ScreenSaver).
-- **conky 1.26 deprecations:** `own_window_transparent` / `own_window_argb_value` -> `own_window_color =
-  '#00000000'`, `own_window_argb_visual` removed, `cairo_xlib_surface_create` deprecated. Check the
-  transparency on screen when changing (a mistake shows as a black box).
 
 ## Cards
 - **GPU card for AMD / Intel:** amdgpu sysfs (`gpu_busy_percent`, `mem_info_vram_used/total`, hwmon temp /

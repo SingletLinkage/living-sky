@@ -2,7 +2,7 @@
 
 ## Layout
 - Each theme is a transparent, click-through, full-screen conky canvas with no conky text
-  (`themes/<name>/conky.conf`). `themes/<name>/<name>.lua` only sets the style (`glass` or `cards`)
+  (`themes/<name>/conky.conf`). `themes/<name>/<name>.lua` only sets the style (`glass`, `cards` or `solid`)
   and loads the engine.
 - `lua/desktop.lua`, the engine: reads `living-sky.conf`, loads the enabled cards, samples them once
   a second, draws each card's panel and header, switches the living-sky wallpaper and palette, and

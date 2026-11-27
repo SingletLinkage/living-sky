@@ -8,7 +8,7 @@
 
 # ── Look ──────────────────────────────────────────────────────────────────────────
 
-# Card style: glass (frosted liquid-glass panes) | cards (solid cards)
+# Card style: glass (frosted liquid-glass panes) | cards (Catppuccin cards) | solid (the same, fully opaque)
 theme = glass
 
 # Accent colours. Primary: the clock, your glob pet, highlights.

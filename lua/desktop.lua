@@ -26,6 +26,7 @@ do local f = io.open(CONF) if f then f:close() else CONF = ROOT .. 'living-sky.c
 os.setlocale('', 'time')                -- weekday / month names from the system locale (LC_TIME only)
 local STYLE = LIVING_SKY_STYLE or 'glass'
 local GLASS = (STYLE == 'glass')
+local SOLID = (STYLE == 'solid')       -- the cards style without any see-through
 local function q(p) return "'" .. p:gsub("'", "'\\''") .. "'" end      -- shell-quote a path
 
 ------------------------------------------------------------------ palette (Mocha)
@@ -299,12 +300,12 @@ local function glass_panel(x, y, w, h, r)
   cairo_set_source(cr, g); cairo_set_line_width(cr, 1.2); cairo_stroke(cr); cairo_pattern_destroy(g)
 end
 
-local function solid_panel(x, y, w, h, r)        -- the cards style
+local function solid_panel(x, y, w, h, r)        -- the cards and solid styles
   rrect(x + 2, y + 4, w, h, r); rgba(M.shadow, M.shadow_a); cairo_fill(cr)
   rrect(x, y, w, h, r)
   local g = cairo_pattern_create_linear(0, y, 0, y + h)
-  cairo_pattern_add_color_stop_rgba(g, 0, M.base[1], M.base[2], M.base[3], M.glass_a1)
-  cairo_pattern_add_color_stop_rgba(g, 1, M.mantle[1], M.mantle[2], M.mantle[3], M.glass_a2)
+  cairo_pattern_add_color_stop_rgba(g, 0, M.base[1], M.base[2], M.base[3], SOLID and 1 or M.glass_a1)
+  cairo_pattern_add_color_stop_rgba(g, 1, M.mantle[1], M.mantle[2], M.mantle[3], SOLID and 1 or M.glass_a2)
   cairo_set_source(cr, g); cairo_fill_preserve(cr); cairo_pattern_destroy(g)
   rgba(M.surface1, 0.55); cairo_set_line_width(cr, 1); cairo_stroke(cr)
 end
@@ -604,7 +605,9 @@ local function conf_watch()
   if conf_tick > 0 then return end
   conf_tick = 5
   local new, txt = conf_read()
-  local restart = 'setsid -f ' .. q(ROOT .. 'bin/living-sky') .. ' restart >/dev/null 2>&1 < /dev/null'
+  -- restart with the configured theme: a bare `restart` would bring back the theme that is running now
+  local theme = (new.theme or ''):match('^[%w_-]+$') or ''
+  local restart = 'setsid -f ' .. q(ROOT .. 'bin/living-sky') .. ' restart ' .. theme .. ' >/dev/null 2>&1 < /dev/null'
   if txt == CFG_TEXT then
     if pet_for(CFG) ~= PET then os.execute(restart); conf_tick = 60 end    -- glob = random: a new day
     return
@@ -644,8 +647,13 @@ function conky_living_sky_main()
     sky_update()
     music_poll()
   end
-  local cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable,
-    conky_window.visual, conky_window.width, conky_window.height)
+  -- conky 1.26+ hands out its own drawing surface (it owns it: never destroy it); older conky: make one
+  local cs = conky_surface and conky_surface()
+  local own_cs = not cs
+  if own_cs then
+    cs = cairo_xlib_surface_create(conky_window.display, conky_window.drawable,
+      conky_window.visual, conky_window.width, conky_window.height)
+  end
   if GLASS and frost.img and not frost.xs then
     local ok, xs = pcall(cairo_surface_create_similar, cs, CAIRO_CONTENT_COLOR, ART_W, ART_H)
     if ok and xs then
@@ -688,7 +696,7 @@ function conky_living_sky_main()
     cairo_restore(cr)
   else draw() end
   if mctx then gcall(GLOB.draw_front, mctx) end
-  cairo_destroy(cr); cairo_surface_destroy(cs); cr = nil
+  cairo_destroy(cr); if own_cs then cairo_surface_destroy(cs) end; cr = nil
 
   local flag = SKYDIR .. 'preview-' .. STYLE
   local ff = io.open(flag, 'r')

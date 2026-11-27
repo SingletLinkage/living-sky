@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # living-sky: start / stop / switch the living-sky conky desktop.
 #
-#   living-sky start [glass|cards]   start (default: `theme` from living-sky.conf, else glass)
+#   living-sky start [glass|cards|solid] start (default: `theme` from living-sky.conf, else glass)
 #   living-sky stop                  stop it and put your previous wallpaper back
 #   living-sky restart [theme]
 #   living-sky status
